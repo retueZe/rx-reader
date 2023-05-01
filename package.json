@@ -21,9 +21,9 @@
   ],
   "scripts": {
     "lint": "eslint .",
-    "build:prod": "rollup -c",
+    "build": "rollup -c",
     "clean": "rm -rf dist",
-    "prepare": "npm run build:prod",
+    "prepare": "npm run build",
     "postpublish": "npm run clean"
   },
   "devDependencies": {
@@ -39,5 +39,8 @@
   },
   "peerDependencies": {
     "rxjs": "^7.0.0"
+  },
+  "dependencies": {
+    "async-option": "^2.4.0"
   }
 }

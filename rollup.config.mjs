@@ -33,8 +33,11 @@ function applyDefaultConfig(config) {
     return {
         ...config,
         input: createInput([
-            ''
-        ])
+            '',
+            'operators',
+            'utils'
+        ]),
+        external: ['async-option', 'rxjs']
     }
 }
 

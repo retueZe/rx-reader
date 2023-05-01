@@ -13,6 +13,7 @@
         "semi": ["error", "never"],
         "eqeqeq": "error",
         "no-console": "warn",
+        "no-constant-condition": "off",
         "@typescript-eslint/no-non-null-assertion": "off",
         "@typescript-eslint/no-explicit-any": "off",
         "deprecation/deprecation": "warn"
