@@ -1,0 +1,43 @@
+{
+  "name": "async-reader",
+  "version": "1.0.0-a.1",
+  "author": "Sasukevich Pavel",
+  "license": "MIT",
+  "description": "Fast async streamed I/O library based on RxJS.",
+  "keywords": [
+    "async",
+    "stream",
+    "streaming",
+    "streamed",
+    "io",
+    "reader"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/retueZe/async-reader"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "lint": "eslint .",
+    "build:prod": "rollup -c",
+    "clean": "rm -rf dist",
+    "prepare": "npm run build:prod",
+    "postpublish": "npm run clean"
+  },
+  "devDependencies": {
+    "@rollup/plugin-terser": "^0.4.1",
+    "@rollup/plugin-typescript": "^11.1.0",
+    "@typescript-eslint/eslint-plugin": "^5.59.1",
+    "@typescript-eslint/parser": "^5.59.1",
+    "eslint": "^8.39.0",
+    "eslint-plugin-deprecation": "^1.4.1",
+    "rollup": "^3.21.2",
+    "rollup-plugin-dts": "^5.3.0",
+    "typescript": "^5.0.4"
+  },
+  "peerDependencies": {
+    "rxjs": "^7.0.0"
+  }
+}
