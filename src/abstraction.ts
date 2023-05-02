@@ -12,7 +12,7 @@ export type SimpleOperator<I extends SimpleOperatorId = SimpleOperatorId> = {
     args: SimpleOperatorArgsTypeMap[I]
 }
 export type SimpleOperatorArgsTypeMap = {
-    read: Readonly<{count: number}>
+    read: Readonly<{count: number | null}>
 }
 export type SimpleOperatorId = keyof SimpleOperatorArgsTypeMap
 export type SimpleOperatorArgs = SimpleOperatorArgsTypeMap[SimpleOperatorId]

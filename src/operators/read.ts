@@ -1,8 +1,8 @@
 import type { SimpleOperator } from '../abstraction'
 
-export function read(count: number): SimpleOperator<'read'> {
+export function read(count?: number | null): SimpleOperator<'read'> {
     return {
         id: 'read',
-        args: {count}
+        args: {count: count ?? null}
     }
 }
