@@ -12,10 +12,10 @@ export interface IoBuffer<C extends ChunkTypeId = 'text'> {
     shift(): Option<ChunkTypeMap[C]>
     first(): Option<ChunkTypeMap[C]>
     read(count: number | null, output: ChunkTypeMap[C][]): number
-    read(count: number | null): ChunkTypeMap[C]
+    read(count?: number | null): ChunkTypeMap[C]
     peek(count: number | null, output: ChunkTypeMap[C][]): number
-    peek(count: number | null): ChunkTypeMap[C]
-    skip(count: number | null): number
+    peek(count?: number | null): ChunkTypeMap[C]
+    skip(count?: number | null): number
     require(count: number): Promise<number>
     broadcast(target: IoBuffer<C>): Unsubscribable
 }
@@ -74,9 +74,9 @@ export const IoBuffer: IoBufferConstructor = class IoBuffer<C extends ChunkTypeI
         return count
     }
     read(count: number | null, output: ChunkTypeMap[C][]): number
-    read(count: number | null): ChunkTypeMap[C]
-    read(count: number | null, output?: ChunkTypeMap[C][]): number | ChunkTypeMap[C] {
-        if (count === null) return this._readAll(output)
+    read(count?: number | null): ChunkTypeMap[C]
+    read(count?: number | null, output?: ChunkTypeMap[C][]): number | ChunkTypeMap[C] {
+        if (typeof count === 'undefined' || count === null) return this._readAll(output)
 
         count = this._checkCount(count)
         const returnJoined = typeof output === 'undefined'
@@ -133,9 +133,9 @@ export const IoBuffer: IoBufferConstructor = class IoBuffer<C extends ChunkTypeI
         this._head = this._tail = null
     }
     peek(count: number | null, output: ChunkTypeMap[C][]): number
-    peek(count: number | null): ChunkTypeMap[C]
-    peek(count: number | null, output?: ChunkTypeMap[C][]): number | ChunkTypeMap[C] {
-        if (count === null) return this._peekAll(output)
+    peek(count?: number | null): ChunkTypeMap[C]
+    peek(count?: number | null, output?: ChunkTypeMap[C][]): number | ChunkTypeMap[C] {
+        if (typeof count === 'undefined' || count === null) return this._peekAll(output)
 
         count = this._checkCount(count)
         const returnJoined = typeof output === 'undefined'
@@ -182,8 +182,8 @@ export const IoBuffer: IoBufferConstructor = class IoBuffer<C extends ChunkTypeI
                 : joinChunks(output[0], ...output.slice(1))
             : peeked
     }
-    skip(count: number | null): number {
-        if (count === null) return this._skipAll()
+    skip(count?: number | null): number {
+        if (typeof count === 'undefined' || count === null) return this._skipAll()
 
         count = this._checkCount(count)
         let skipped = 0
@@ -217,13 +217,15 @@ export const IoBuffer: IoBufferConstructor = class IoBuffer<C extends ChunkTypeI
     require(count: number): Promise<number> {
         count = this._checkCount(count)
 
+        if (this.available > count - 0.5) return Promise.resolve(this.available)
+
         return new Promise(resolve => {
-            const subscription = this.onPush.subscribe((function(this: IoBuffer<C>) {
+            const subscription = this.onPush.subscribe(() => {
                 if (this.available < count - 0.5) return
 
                 subscription.unsubscribe()
                 resolve(this.available)
-            }).bind(this))
+            })
         })
     }
     broadcast(target: IoBuffer<C>): Unsubscribable {

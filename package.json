@@ -22,6 +22,7 @@
   "scripts": {
     "lint": "eslint .",
     "build": "rollup -c",
+    "build:dev": "tsc --outDir dist --inlineSourceMap",
     "clean": "rm -rf dist",
     "prepare": "npm run build",
     "postpublish": "npm run clean"

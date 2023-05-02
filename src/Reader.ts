@@ -10,7 +10,7 @@ export interface Reader<C extends ChunkTypeId = 'text'> extends Unsubscribable {
     readonly available: number
     readonly chunkTypeId: C
     readonly isBinary: boolean
-    readonly onPush: Observable<void>
+    readonly onPush: Observable<ChunkTypeMap[C]>
 
     read(operator: SimpleOperator): Promise<ChunkTypeMap[C]>
     read<O, E>(operator: ComplexOperator<O, E, C>): AsyncResult<O, E>
@@ -32,7 +32,7 @@ export const Reader: ReaderConstructor = class Reader<C extends ChunkTypeId = 't
     get isBinary(): boolean {
         return this.chunkTypeId === 'binary'
     }
-    get onPush(): Observable<void> {
+    get onPush(): Observable<ChunkTypeMap[C]> {
         return this._buffer.onPush
     }
 
