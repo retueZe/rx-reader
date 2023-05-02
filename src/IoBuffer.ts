@@ -16,7 +16,7 @@ export interface IoBuffer<C extends ChunkTypeId = 'text'> {
     peek(count: number | null, output: ChunkTypeMap[C][]): number
     peek(count?: number | null): ChunkTypeMap[C]
     skip(count?: number | null): number
-    require(count: number): Promise<number>
+    require(count: number, callback: (available: number) => void): void
     broadcast(target: IoBuffer<C>): Unsubscribable
 }
 type IoBufferInterface<C extends ChunkTypeId = 'text'> = IoBuffer<C>
@@ -214,18 +214,16 @@ export const IoBuffer: IoBufferConstructor = class IoBuffer<C extends ChunkTypeI
 
         return skipped
     }
-    require(count: number): Promise<number> {
+    require(count: number, callback: (available: number) => void): void {
         count = this._checkCount(count)
 
-        if (this.available > count - 0.5) return Promise.resolve(this.available)
+        if (this.available > count - 0.5) return callback(this.available)
 
-        return new Promise(resolve => {
-            const subscription = this.onPush.subscribe(() => {
-                if (this.available < count - 0.5) return
+        const subscription = this.onPush.subscribe(() => {
+            if (this.available < count - 0.5) return
 
-                subscription.unsubscribe()
-                resolve(this.available)
-            })
+            subscription.unsubscribe()
+            callback(this.available)
         })
     }
     broadcast(target: IoBuffer<C>): Unsubscribable {
