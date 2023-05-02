@@ -1,12 +1,12 @@
 import { NONE, Option, Some } from 'async-option'
-import { Observable, Subject } from 'rxjs'
+import { Observable, Subject, Unsubscribable } from 'rxjs'
 import type { ChunkTypeId, ChunkTypeMap } from './abstraction'
 import { getEmptyChunk, joinChunks, subviewChunk } from './utils'
 
 export interface IoBuffer<C extends ChunkTypeId = 'text'> {
     readonly available: number
     readonly chunkTypeId: C
-    readonly onPush: Observable<void>
+    readonly onPush: Observable<ChunkTypeMap[C]>
 
     push(chunk: ChunkTypeMap[C]): this
     shift(): Option<ChunkTypeMap[C]>
@@ -17,15 +17,16 @@ export interface IoBuffer<C extends ChunkTypeId = 'text'> {
     peek(count: number): ChunkTypeMap[C]
     skip(count: number): number
     require(count: number): Promise<number>
+    broadcast(target: IoBuffer<C>): Unsubscribable
 }
 type IoBufferInterface<C extends ChunkTypeId = 'text'> = IoBuffer<C>
 export const IoBuffer: IoBufferConstructor = class IoBuffer<C extends ChunkTypeId = 'text'> implements IoBufferInterface<C> {
-    private readonly _onPushSubject = new Subject<void>()
+    private readonly _onPushSubject = new Subject<ChunkTypeMap[C]>()
     private _head: ChunkNode<C> | null = null
     private _tail: ChunkNode<C> | null = null
     available = 0
     readonly chunkTypeId: C
-    readonly onPush: Observable<void> = this._onPushSubject.asObservable()
+    readonly onPush: Observable<ChunkTypeMap[C]> = this._onPushSubject.asObservable()
 
     constructor(chunkTypeId: C) {
         this.chunkTypeId = chunkTypeId
@@ -42,7 +43,7 @@ export const IoBuffer: IoBufferConstructor = class IoBuffer<C extends ChunkTypeI
         }
 
         this.available += chunk.length
-        this._onPushSubject.next()
+        this._onPushSubject.next(chunk)
 
         return this
     }
@@ -173,6 +174,9 @@ export const IoBuffer: IoBufferConstructor = class IoBuffer<C extends ChunkTypeI
                 resolve(this.available)
             }).bind(this))
         })
+    }
+    broadcast(target: IoBuffer<C>): Unsubscribable {
+        return this.onPush.subscribe(target.push.bind(target))
     }
 }
 interface IoBufferConstructor {
