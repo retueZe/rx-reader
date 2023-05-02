@@ -1,4 +1,4 @@
-import { Option, Result } from 'async-option'
+import { Result } from 'async-option'
 import { AsyncResult } from 'async-option/async'
 import { Observable, Subject, Unsubscribable } from 'rxjs'
 import { IoBuffer } from './IoBuffer'
@@ -14,8 +14,6 @@ export interface Reader<C extends ChunkTypeId = 'text'> extends Unsubscribable {
 
     read(operator: SimpleOperator): Promise<ChunkTypeMap[C]>
     read<O, E>(operator: ComplexOperator<O, E, C>): AsyncResult<O, E>
-    query(operator: SimpleOperator): Option<ChunkTypeMap[C]>
-    query<O, E>(operator: ComplexOperator<O, E, C>): Option<Result<O, E>>
 }
 type ReaderInterface<C extends ChunkTypeId = 'text'> = Reader<C>
 export const Reader: ReaderConstructor = class Reader<C extends ChunkTypeId = 'text'> implements ReaderInterface<C> {
@@ -61,12 +59,6 @@ export const Reader: ReaderConstructor = class Reader<C extends ChunkTypeId = 't
         return typeof operator === 'function'
             ? new Promise(resolve => this._interpretComplexOperator(operator(), resolve))
             : new Promise(resolve => this._interpretSimpleOperator(operator, resolve))
-    }
-    query(operator: SimpleOperator): Option<ChunkTypeMap[C]>
-    query<O, E>(operator: ComplexOperator<O, E, C>): Option<Result<O, E>>
-    query(operator: SimpleOperator | ComplexOperator<unknown, unknown, C>): Option<unknown> {
-        // TODO
-        return null as any
     }
     private _interpretSimpleOperator(
         operator: SimpleOperator,
