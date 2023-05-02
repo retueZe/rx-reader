@@ -13,6 +13,8 @@ export type SimpleOperator<I extends SimpleOperatorId = SimpleOperatorId> = {
 }
 export type SimpleOperatorArgsTypeMap = {
     read: Readonly<{count: number | null}>
+    peek: Readonly<{count: number | null}>
+    skip: Readonly<{count: number | null}>
 }
 export type SimpleOperatorId = keyof SimpleOperatorArgsTypeMap
 export type SimpleOperatorArgs = SimpleOperatorArgsTypeMap[SimpleOperatorId]

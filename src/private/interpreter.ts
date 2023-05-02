@@ -1,7 +1,7 @@
 import { ChunkTypeId, ChunkTypeMap, SimpleOperatorArgsTypeMap, SimpleOperatorId } from '../abstraction'
 import { IoBuffer } from '../IoBuffer'
 import { Reader } from '../Reader'
-import { read } from './interpreters/read'
+import { read, peek, skip } from './interpreters'
 
 export type InterpreterCallback<C extends ChunkTypeId = 'text'> = (chunk: ChunkTypeMap[C]) => void
 export type Interpreter<I extends SimpleOperatorId = SimpleOperatorId> =
@@ -14,4 +14,4 @@ export type Interpreter<I extends SimpleOperatorId = SimpleOperatorId> =
 export type InterpreterMap = {
     [I in SimpleOperatorId]: Interpreter<I>
 }
-export const INTERPRETERS: Readonly<InterpreterMap> = {read}
+export const INTERPRETERS: Readonly<InterpreterMap> = {read, peek, skip}
