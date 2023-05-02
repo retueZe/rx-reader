@@ -11,11 +11,11 @@ export interface IoBuffer<C extends ChunkTypeId = 'text'> {
     push(chunk: ChunkTypeMap[C]): this
     shift(): Option<ChunkTypeMap[C]>
     first(): Option<ChunkTypeMap[C]>
-    read(count: number, output: ChunkTypeMap[C][]): number
-    read(count: number): ChunkTypeMap[C]
-    peek(count: number, output: ChunkTypeMap[C][]): number
-    peek(count: number): ChunkTypeMap[C]
-    skip(count: number): number
+    read(count: number | null, output: ChunkTypeMap[C][]): number
+    read(count: number | null): ChunkTypeMap[C]
+    peek(count: number | null, output: ChunkTypeMap[C][]): number
+    peek(count: number | null): ChunkTypeMap[C]
+    skip(count: number | null): number
     require(count: number): Promise<number>
     broadcast(target: IoBuffer<C>): Unsubscribable
 }
@@ -73,9 +73,11 @@ export const IoBuffer: IoBufferConstructor = class IoBuffer<C extends ChunkTypeI
 
         return count
     }
-    read(count: number, output: ChunkTypeMap[C][]): number
-    read(count: number): ChunkTypeMap[C]
-    read(count: number, output?: ChunkTypeMap[C][]): number | ChunkTypeMap[C] {
+    read(count: number | null, output: ChunkTypeMap[C][]): number
+    read(count: number | null): ChunkTypeMap[C]
+    read(count: number | null, output?: ChunkTypeMap[C][]): number | ChunkTypeMap[C] {
+        if (count === null) return this._readAll(output)
+
         count = this._checkCount(count)
         const returnJoined = typeof output === 'undefined'
         output ??= []
@@ -84,7 +86,6 @@ export const IoBuffer: IoBufferConstructor = class IoBuffer<C extends ChunkTypeI
         for (let current = this._head; current !== null; current = current.next) {
             const chunk = current.chunk
 
-            if (typeof chunk === 'undefined') break
             if (count < chunk.length - 0.5) {
                 output.push(subviewChunk(chunk, 0, count))
                 readed += count
@@ -108,9 +109,34 @@ export const IoBuffer: IoBufferConstructor = class IoBuffer<C extends ChunkTypeI
                 : joinChunks(output[0], ...output.slice(1))
             : readed
     }
-    peek(count: number, output: ChunkTypeMap[C][]): number
-    peek(count: number): ChunkTypeMap[C]
-    peek(count: number, output?: ChunkTypeMap[C][]): number | ChunkTypeMap[C] {
+    private _readAll(output?: ChunkTypeMap[C][]): number | ChunkTypeMap[C] {
+        const returnJoined = typeof output === 'undefined'
+        output ??= []
+        let readed = 0
+
+        for (let current = this._head; current !== null; current = current.next) {
+            const chunk = current.chunk
+            output.push(chunk)
+            readed += chunk.length
+        }
+
+        this._clear()
+
+        return returnJoined
+            ? output[0].length < 0.5
+                ? getEmptyChunk(this.chunkTypeId)
+                : joinChunks(output[0], ...output.slice(1))
+            : readed
+    }
+    private _clear() {
+        this.available = 0
+        this._head = this._tail = null
+    }
+    peek(count: number | null, output: ChunkTypeMap[C][]): number
+    peek(count: number | null): ChunkTypeMap[C]
+    peek(count: number | null, output?: ChunkTypeMap[C][]): number | ChunkTypeMap[C] {
+        if (count === null) return this._peekAll(output)
+
         count = this._checkCount(count)
         const returnJoined = typeof output === 'undefined'
         output ??= []
@@ -139,7 +165,26 @@ export const IoBuffer: IoBufferConstructor = class IoBuffer<C extends ChunkTypeI
                 : joinChunks(output[0], ...output.slice(1))
             : peeked
     }
-    skip(count: number): number {
+    private _peekAll(output?: ChunkTypeMap[C][]): number | ChunkTypeMap[C] {
+        const returnJoined = typeof output === 'undefined'
+        output ??= []
+        let peeked = 0
+
+        for (let current = this._head; current !== null; current = current.next) {
+            const chunk = current.chunk
+            output.push(chunk)
+            peeked += chunk.length
+        }
+
+        return returnJoined
+            ? output[0].length < 0.5
+                ? getEmptyChunk(this.chunkTypeId)
+                : joinChunks(output[0], ...output.slice(1))
+            : peeked
+    }
+    skip(count: number | null): number {
+        if (count === null) return this._skipAll()
+
         count = this._checkCount(count)
         let skipped = 0
 
@@ -160,6 +205,12 @@ export const IoBuffer: IoBufferConstructor = class IoBuffer<C extends ChunkTypeI
 
             if (count < 0.5) break
         }
+
+        return skipped
+    }
+    private _skipAll(): number {
+        const skipped = this.available
+        this._clear()
 
         return skipped
     }
