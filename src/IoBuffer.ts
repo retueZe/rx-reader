@@ -104,7 +104,7 @@ export const IoBuffer: IoBufferConstructor = class IoBuffer<C extends ChunkTypeI
         }
 
         return returnJoined
-            ? output[0].length < 0.5
+            ? output.length < 0.5
                 ? getEmptyChunk(this.chunkTypeId)
                 : joinChunks(output[0], ...output.slice(1))
             : readed
@@ -123,7 +123,7 @@ export const IoBuffer: IoBufferConstructor = class IoBuffer<C extends ChunkTypeI
         this._clear()
 
         return returnJoined
-            ? output[0].length < 0.5
+            ? output.length < 0.5
                 ? getEmptyChunk(this.chunkTypeId)
                 : joinChunks(output[0], ...output.slice(1))
             : readed
@@ -160,7 +160,7 @@ export const IoBuffer: IoBufferConstructor = class IoBuffer<C extends ChunkTypeI
         }
 
         return returnJoined
-            ? output[0].length < 0.5
+            ? output.length < 0.5
                 ? getEmptyChunk(this.chunkTypeId)
                 : joinChunks(output[0], ...output.slice(1))
             : peeked
@@ -177,7 +177,7 @@ export const IoBuffer: IoBufferConstructor = class IoBuffer<C extends ChunkTypeI
         }
 
         return returnJoined
-            ? output[0].length < 0.5
+            ? output.length < 0.5
                 ? getEmptyChunk(this.chunkTypeId)
                 : joinChunks(output[0], ...output.slice(1))
             : peeked

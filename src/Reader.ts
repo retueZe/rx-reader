@@ -1,9 +1,9 @@
 import { Option, Result } from 'async-option'
 import { AsyncResult } from 'async-option/async'
-import { Observable, Unsubscribable } from 'rxjs'
+import { Observable, Subject, Unsubscribable } from 'rxjs'
 import { IoBuffer } from './IoBuffer'
 import type { ChunkTypeId, ChunkTypeMap, SimpleOperator, ComplexOperator, SimpleOperatorIterator } from './abstraction'
-import { getEmptyChunk } from './utils/chunk'
+import { InterpreterCallback, INTERPRETERS } from './private/interpreter'
 
 export interface Reader<C extends ChunkTypeId = 'text'> extends Unsubscribable {
     readonly isCompleted: boolean
@@ -19,9 +19,9 @@ export interface Reader<C extends ChunkTypeId = 'text'> extends Unsubscribable {
 }
 type ReaderInterface<C extends ChunkTypeId = 'text'> = Reader<C>
 export const Reader: ReaderConstructor = class Reader<C extends ChunkTypeId = 'text'> implements ReaderInterface<C> {
+    private readonly _onPushSubject: Subject<ChunkTypeMap[C]> = new Subject()
     private readonly _subscription: Unsubscribable
     private readonly _buffer: IoBuffer<C>
-    private _isUnsubscribed = false
     isCompleted = false
     get available(): number {
         return this._buffer.available
@@ -32,17 +32,16 @@ export const Reader: ReaderConstructor = class Reader<C extends ChunkTypeId = 't
     get isBinary(): boolean {
         return this.chunkTypeId === 'binary'
     }
-    get onPush(): Observable<ChunkTypeMap[C]> {
-        return this._buffer.onPush
-    }
+    readonly onPush: Observable<ChunkTypeMap[C]> = this._onPushSubject.asObservable()
 
     constructor(chunkTypeId: C, source: Observable<ChunkTypeMap[C]>)
     constructor(buffer: IoBuffer<C>, source: Observable<ChunkTypeMap[C]>)
     constructor(buffer: C | IoBuffer<C>, source: Observable<ChunkTypeMap[C]>) {
         this._buffer = typeof buffer === 'string' ? new IoBuffer(buffer) : buffer
+        this._buffer.onPush.subscribe(this._onPushSubject.next.bind(this._onPushSubject))
         this._subscription = source.subscribe({
             next: this._next.bind(this),
-            complete: this._complete.bind(this)
+            complete: this.unsubscribe.bind(this)
         })
     }
 
@@ -51,12 +50,10 @@ export const Reader: ReaderConstructor = class Reader<C extends ChunkTypeId = 't
 
         this._buffer.push(chunk)
     }
-    private _complete(): void {
-        this.isCompleted = true
-    }
     unsubscribe(): void {
-        this._isUnsubscribed = true
         this.isCompleted = true
+        this._subscription.unsubscribe()
+        this._onPushSubject.complete()
     }
     read(operator: SimpleOperator): Promise<ChunkTypeMap[C]>
     read<O, E>(operator: ComplexOperator<O, E, C>): AsyncResult<O, E>
@@ -75,21 +72,7 @@ export const Reader: ReaderConstructor = class Reader<C extends ChunkTypeId = 't
         operator: SimpleOperator,
         callback: InterpreterCallback<C>
     ): ChunkTypeMap[C] | null {
-        if (operator.id === 'read') {
-            const count = operator.args.count
-
-            if (count < this.available + 0.5) return this._buffer.read(count)
-
-            this.onPush.subscribe(() => {
-                if (count > this.available + 0.5) return
-
-                callback(this._buffer.read(count))
-            })
-
-            return null
-        }
-
-        return getEmptyChunk(this.chunkTypeId)
+        return INTERPRETERS[operator.id](operator.args, this, this._buffer, callback)
     }
     private _interpretComplexOperator(
         iterator: SimpleOperatorIterator<unknown, unknown, C>,
@@ -119,5 +102,3 @@ interface ReaderConstructor {
     new<C extends ChunkTypeId = 'text'>(buffer: IoBuffer<C>, source: Observable<ChunkTypeMap[C]>): Reader<C>
     new<C extends ChunkTypeId = 'text'>(chunkTypeId: C, source: Observable<ChunkTypeMap[C]>): Reader<C>
 }
-
-type InterpreterCallback<C extends ChunkTypeId = 'text'> = (chunk: ChunkTypeMap[C]) => void
