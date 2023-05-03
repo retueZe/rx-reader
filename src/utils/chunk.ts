@@ -1,4 +1,4 @@
-import { ChunkTypeId, ChunkTypeMap } from '../abstraction'
+import type { ChunkItemTypeMap, ChunkTypeId, ChunkTypeMap } from '..'
 
 export type ChunkTypeIdFromChunkType<C> = C extends string
     ? 'text'
@@ -40,4 +40,7 @@ export function getEmptyChunk<C extends ChunkTypeId>(typeId: C): ChunkTypeMap[C]
     return typeId === 'text'
         ? '' as ChunkTypeMap[C]
         : new Uint8Array() as ChunkTypeMap[C]
+}
+export function getChunkItem<C extends ChunkTypeId>(chunk: ChunkTypeMap[C], i: number): ChunkItemTypeMap[C] {
+    return chunk[i] as ChunkItemTypeMap[C]
 }

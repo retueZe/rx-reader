@@ -1,14 +1,18 @@
 import { NONE, Option, Some } from 'async-option'
-import { Observable, Subject, Unsubscribable } from 'rxjs'
-import type { ChunkTypeId, ChunkTypeMap } from './abstraction'
+import { Observable, Observer, Subject, Subscribable, Unsubscribable } from 'rxjs'
+import type { ChunkTypeId, ChunkTypeMap, IReader } from './abstraction'
+import { Reader } from './private/Reader'
 import { getEmptyChunk, joinChunks, subviewChunk } from './utils'
 
-export interface IoBuffer<C extends ChunkTypeId = 'text'> {
+export interface IoBuffer<C extends ChunkTypeId = 'text'> extends Observer<ChunkTypeMap[C]> {
     readonly available: number
     readonly chunkTypeId: C
+    readonly isBinary: boolean
+    readonly isEmpty: boolean
+    readonly isCompleted: boolean
     readonly onPush: Observable<ChunkTypeMap[C]>
 
-    push(chunk: ChunkTypeMap[C]): this
+    next(chunk: ChunkTypeMap[C]): this
     shift(): Option<ChunkTypeMap[C]>
     first(): Option<ChunkTypeMap[C]>
     read(count: number | null, output: ChunkTypeMap[C][]): number
@@ -17,7 +21,9 @@ export interface IoBuffer<C extends ChunkTypeId = 'text'> {
     peek(count?: number | null): ChunkTypeMap[C]
     skip(count?: number | null): number
     require(count: number, callback: (available: number) => void): void
-    broadcast(target: IoBuffer<C>): Unsubscribable
+    pipe(target: IoBuffer<C>): Unsubscribable
+    consume(source: Subscribable<ChunkTypeMap[C]>): Unsubscribable
+    createReader(): IReader<C>
 }
 type IoBufferInterface<C extends ChunkTypeId = 'text'> = IoBuffer<C>
 export const IoBuffer: IoBufferConstructor = class IoBuffer<C extends ChunkTypeId = 'text'> implements IoBufferInterface<C> {
@@ -26,13 +32,22 @@ export const IoBuffer: IoBufferConstructor = class IoBuffer<C extends ChunkTypeI
     private _tail: ChunkNode<C> | null = null
     available = 0
     readonly chunkTypeId: C
+    get isCompleted(): boolean {
+        return this._onPushSubject.closed
+    }
+    get isBinary(): boolean {
+        return this.chunkTypeId === 'binary'
+    }
+    get isEmpty(): boolean {
+        return this.available < 0.5
+    }
     readonly onPush: Observable<ChunkTypeMap[C]> = this._onPushSubject.asObservable()
 
     constructor(chunkTypeId: C) {
         this.chunkTypeId = chunkTypeId
     }
 
-    push(chunk: ChunkTypeMap[C]): this {
+    next(chunk: ChunkTypeMap[C]): this {
         const next: ChunkNode<C> = {next: null, chunk}
 
         if (this._tail === null)
@@ -46,6 +61,12 @@ export const IoBuffer: IoBufferConstructor = class IoBuffer<C extends ChunkTypeI
         this._onPushSubject.next(chunk)
 
         return this
+    }
+    error(error: Error): void {
+        this._onPushSubject.error(error)
+    }
+    complete(): void {
+        this._onPushSubject.complete()
     }
     shift(): Option<ChunkTypeMap[C]> {
         if (this._head === null) return NONE
@@ -226,8 +247,19 @@ export const IoBuffer: IoBufferConstructor = class IoBuffer<C extends ChunkTypeI
             callback(this.available)
         })
     }
-    broadcast(target: IoBuffer<C>): Unsubscribable {
-        return this.onPush.subscribe(target.push.bind(target))
+    pipe(target: Observer<ChunkTypeMap[C]>): Unsubscribable {
+        return this.onPush.subscribe({
+            next: chunk => target.next(chunk),
+            error: error => target.error(error)
+        })
+    }
+    consume(source: Subscribable<ChunkTypeMap[C]>): Unsubscribable {
+        return source.subscribe({
+            next: this.next.bind(this)
+        })
+    }
+    createReader(): IReader<C> {
+        return new Reader(this)
     }
 }
 interface IoBufferConstructor {

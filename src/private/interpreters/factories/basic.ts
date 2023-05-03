@@ -1,30 +1,39 @@
+import { Failure, Success } from 'async-option'
+import type {  Unsubscribable } from 'rxjs'
 import type { ChunkTypeId, ChunkTypeMap, IoBuffer } from '../../..'
-import type { Interpreter } from '../../interpreter'
+import { EndOfStreamError } from '../../../EndOfStreamError'
+import type { GenericInterpreter } from '../../interpreter'
 
 export type BasicOperatorId = 'read' | 'peek' | 'skip'
 export type BasicInterpreterFactory = <I extends BasicOperatorId = BasicOperatorId>(
     action: <C extends ChunkTypeId = 'text'>(buffer: IoBuffer<C>, count: number | null) => ChunkTypeMap[C]
-) => Interpreter<I>
+) => GenericInterpreter<I>
 export const createBasicInterpreter: BasicInterpreterFactory = action => (args, reader, buffer, callback) => {
     const count = args.count
 
     if (count === null) {
-        if (reader.isCompleted) return action(buffer, null)
+        if (reader.isCompleted) return new Success(action(buffer, null))
 
         reader.onPush.subscribe({
-            complete: () => callback(action(buffer, null))
+            error: () => callback(new Failure(new EndOfStreamError())),
+            complete: () => callback(new Success(action(buffer, null)))
         })
 
         return null
     }
-    if (count < reader.available + 0.5) return action(buffer, count)
-    if (reader.isCompleted) return null
+    if (count < reader.available + 0.5) return new Success(action(buffer, count))
+    if (reader.isCompleted) return new Failure(new EndOfStreamError())
 
-    const subscription = reader.onPush.subscribe(() => {
-        if (count > reader.available + 0.5) return
+    let subscription: Unsubscribable | null = null
+    subscription = reader.onPush.subscribe({
+        next: () => {
+            if (count > reader.available + 0.5) return
+            if (subscription !== null) subscription.unsubscribe()
 
-        subscription.unsubscribe()
-        callback(action(buffer, count))
+            callback(new Success(action(buffer, count)))
+        },
+        error: error => callback(new Failure(error)),
+        complete: () => callback(new Failure(new EndOfStreamError()))
     })
 
     return null

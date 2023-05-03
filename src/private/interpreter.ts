@@ -1,17 +1,26 @@
-import { ChunkTypeId, ChunkTypeMap, SimpleOperatorArgsTypeMap, SimpleOperatorId } from '../abstraction'
-import { IoBuffer } from '../IoBuffer'
-import { Reader } from '../Reader'
-import { read, peek, skip } from './interpreters'
+import type { Result } from 'async-option'
+import type { ChunkTypeId, ChunkTypeMap, GenericOperatorId, IoBuffer, IReader, SimpleOperatorArgsTypeMap, SimpleOperatorId } from '..'
+import { read, readWhile, peek, skip } from './interpreters'
 
-export type InterpreterCallback<C extends ChunkTypeId = 'text'> = (chunk: ChunkTypeMap[C]) => void
-export type Interpreter<I extends SimpleOperatorId = SimpleOperatorId> =
-    <C extends ChunkTypeId = 'text'>(
-        args: SimpleOperatorArgsTypeMap[I],
-        reader: Reader<C>,
-        buffer: IoBuffer<C>,
-        callback: InterpreterCallback<C>
-    ) => ChunkTypeMap[C] | null
+export type InterpreterCallback<C extends ChunkTypeId = 'text'> = (chunk: Result<ChunkTypeMap[C], Error>) => void
+export type Interpreter<C extends ChunkTypeId = 'text', I extends SimpleOperatorId[C] = SimpleOperatorId[C]> = (
+    args: SimpleOperatorArgsTypeMap[C][I],
+    reader: IReader<C>,
+    buffer: IoBuffer<C>,
+    callback: InterpreterCallback<C>
+) => Result<ChunkTypeMap[C], Error> | null
+export type GenericInterpreter<I extends GenericOperatorId = GenericOperatorId> = <C extends ChunkTypeId = 'text'>(
+    args: SimpleOperatorArgsTypeMap[C][I],
+    reader: IReader<C>,
+    buffer: IoBuffer<C>,
+    callback: InterpreterCallback<C>
+) => Result<ChunkTypeMap[C], Error> | null
 export type InterpreterMap = {
-    [I in SimpleOperatorId]: Interpreter<I>
+    [C in ChunkTypeId]: {
+        [I in SimpleOperatorId[C]]: Interpreter<C, I>
+    }
 }
-export const INTERPRETERS: Readonly<InterpreterMap> = {read, peek, skip}
+export const INTERPRETERS: Readonly<InterpreterMap> = {
+    'text': {read, readWhile, peek, skip},
+    'binary': {read, readWhile, peek, skip}
+}
