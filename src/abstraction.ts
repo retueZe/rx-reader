@@ -8,10 +8,10 @@ export type SimpleGenericOperatorArgsTypeMap = {
     skip: Readonly<{count: number | null}>
 }
 export type SimpleTextOperatorArgsTypeMap = SimpleGenericOperatorArgsTypeMap & {
-    readWhile: Readonly<{condition: (char: string) => boolean, limit: number | null}>
+    readWhile: Readonly<{condition: (char: string) => boolean, limit: number | null, inclusive: boolean}>
 }
 export type SimpleBinaryOperatorArgsTypeMap = SimpleGenericOperatorArgsTypeMap & {
-    readWhile: Readonly<{condition: (byte: number) => boolean, limit: number | null}>
+    readWhile: Readonly<{condition: (byte: number) => boolean, limit: number | null, inclusive: boolean}>
 }
 
 type ChunkTypeInfoMap = {

@@ -12,14 +12,18 @@ export const readWhile: GenericInterpreter<'readWhile'> = <C extends ChunkTypeId
     callback: InterpreterCallback<C>
 ): Result<ChunkTypeMap[C], Error> | null => {
     const condition = args.condition as (item: ChunkItemTypeMap[C]) => boolean
-    const limit = args.limit
+    const limit = args.limit === null ? null : Math.floor(args.limit)
+    const inclusive = args.inclusive
     const chunks: ChunkTypeMap[C][] = []
 
-    return body(condition, limit, chunks, reader, buffer, callback)
+    if (limit !== null && limit < -0.5) throw new RangeError('Limit cannot be negative.')
+
+    return body(condition, limit, inclusive, chunks, reader, buffer, callback)
 }
 function body<C extends ChunkTypeId = 'text'>(
     condition: (item: ChunkItemTypeMap[C]) => boolean,
     limit: number | null,
+    inclusive: boolean,
     chunks: ChunkTypeMap[C][],
     reader: IReader<C>,
     buffer: IoBuffer<C>,
@@ -36,7 +40,7 @@ function body<C extends ChunkTypeId = 'text'>(
                 if (buffer.isEmpty) return
                 if (subscription !== null) subscription.unsubscribe()
 
-                const chunk = body(condition, limit, chunks, reader, buffer, callback)
+                const chunk = body(condition, limit, inclusive, chunks, reader, buffer, callback)
 
                 if (chunk !== null) callback(chunk)
             })
@@ -45,16 +49,29 @@ function body<C extends ChunkTypeId = 'text'>(
         }
 
         const chunk = chunkOption.value
+        const maxRead = limit === null
+            ? chunk.length
+            : Math.min(limit, chunk.length)
 
-        for (let i = 0; i < chunk.length - 0.5; i++) {
+        if (limit !== null) limit -= maxRead
+
+        for (let i = 0; i < maxRead - 0.5; i++) {
             const item = getChunkItem(chunk, i)
 
             if (!condition(item)) {
-                const chunkSubview = buffer.read(i)
+                const offset = inclusive ? i + 1 : i
+                const chunkSubview = buffer.read(offset)
                 chunks.push(chunkSubview)
 
                 return new Success(joinChunks(chunks[0], ...chunks.slice(1)))
             }
+        }
+
+        if (limit !== null && limit < 0.5) {
+            const chunkSubview = buffer.read(maxRead)
+            chunks.push(chunkSubview)
+
+            return new Success(joinChunks(chunks[0], ...chunks.slice(1)))
         }
 
         chunks.push(chunk)
