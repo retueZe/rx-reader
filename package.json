@@ -10,7 +10,8 @@
     "streaming",
     "streamed",
     "io",
-    "reader"
+    "reader",
+    "rxjs"
   ],
   "repository": {
     "type": "git",

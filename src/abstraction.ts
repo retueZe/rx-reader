@@ -9,9 +9,13 @@ export type SimpleGenericOperatorArgsTypeMap = {
 }
 export type SimpleTextOperatorArgsTypeMap = SimpleGenericOperatorArgsTypeMap & {
     readWhile: Readonly<{condition: (char: string) => boolean, limit: number | null, inclusive: boolean}>
+    peekWhile: Readonly<{condition: (char: string) => boolean, limit: number | null, inclusive: boolean}>
+    skipWhile: Readonly<{condition: (char: string) => boolean, limit: number | null, inclusive: boolean}>
 }
 export type SimpleBinaryOperatorArgsTypeMap = SimpleGenericOperatorArgsTypeMap & {
     readWhile: Readonly<{condition: (byte: number) => boolean, limit: number | null, inclusive: boolean}>
+    peekWhile: Readonly<{condition: (byte: number) => boolean, limit: number | null, inclusive: boolean}>
+    skipWhile: Readonly<{condition: (byte: number) => boolean, limit: number | null, inclusive: boolean}>
 }
 
 type ChunkTypeInfoMap = {

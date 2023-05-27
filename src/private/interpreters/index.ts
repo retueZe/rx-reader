@@ -1,4 +1,6 @@
 export * from './read'
 export * from './readWhile'
 export * from './peek'
+export * from './peekWhile'
 export * from './skip'
+export * from './skipWhile'
