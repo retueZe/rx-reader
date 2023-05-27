@@ -5,7 +5,7 @@ import { Reader } from './private/Reader'
 import { SubviewIoBuffer } from './private/SubviewIoBuffer'
 import { getEmptyChunk, joinChunks, subviewChunk } from './utils'
 
-export interface IoBuffer<C extends ChunkTypeId = 'text'> extends Observer<ChunkTypeMap[C]> {
+export interface IIoBuffer<C extends ChunkTypeId = 'text'> extends Observer<ChunkTypeMap[C]> {
     readonly available: number
     readonly chunkTypeId: C
     readonly isBinary: boolean
@@ -22,13 +22,12 @@ export interface IoBuffer<C extends ChunkTypeId = 'text'> extends Observer<Chunk
     peek(count?: number | null): ChunkTypeMap[C]
     skip(count?: number | null): number
     require(count: number, callback: (available: number) => void): void
-    pipe(target: IoBuffer<C>): Unsubscribable
+    pipe(target: IIoBuffer<C>): Unsubscribable
     consume(source: Subscribable<ChunkTypeMap[C]>): Unsubscribable
     createReader(): IReader<C>
-    subview(start?: number | null): IoBuffer<C>
+    subview(start?: number | null): IIoBuffer<C>
 }
-type IoBufferInterface<C extends ChunkTypeId = 'text'> = IoBuffer<C>
-export const IoBuffer: IoBufferConstructor = class IoBuffer<C extends ChunkTypeId = 'text'> implements IoBufferInterface<C> {
+export const IoBuffer: IoBufferConstructor = class IoBuffer<C extends ChunkTypeId = 'text'> implements IIoBuffer<C> {
     private readonly _onPushSubject = new Subject<ChunkTypeMap[C]>()
     private _head: ChunkNode<C> | null = null
     private _tail: ChunkNode<C> | null = null
@@ -268,7 +267,7 @@ export const IoBuffer: IoBufferConstructor = class IoBuffer<C extends ChunkTypeI
     createReader(): IReader<C> {
         return new Reader(this)
     }
-    subview(start?: number | null | undefined): IoBufferInterface<C> {
+    subview(start?: number | null | undefined): IIoBuffer<C> {
         return new SubviewIoBuffer(
             this,
             this._subviewPeek.bind(this),
@@ -333,9 +332,9 @@ export const IoBuffer: IoBufferConstructor = class IoBuffer<C extends ChunkTypeI
     }
 }
 interface IoBufferConstructor {
-    readonly prototype: IoBuffer<any>
+    readonly prototype: IIoBuffer<any>
 
-    new<C extends ChunkTypeId = 'text'>(chunkTypeId: C): IoBuffer<C>
+    new<C extends ChunkTypeId = 'text'>(chunkTypeId: C): IIoBuffer<C>
 }
 
 type ChunkNode<C extends ChunkTypeId = 'text'> = {

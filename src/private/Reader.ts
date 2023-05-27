@@ -1,14 +1,14 @@
 import type { Result } from 'async-option'
 import type { AsyncResult } from 'async-option/async'
 import { Observable, Subject, Unsubscribable } from 'rxjs'
-import type { IoBuffer } from '../IoBuffer'
+import type { IIoBuffer } from '../IoBuffer'
 import type { ChunkTypeId, ChunkTypeMap, SimpleOperator, ComplexOperator, SimpleOperatorIterator, IReader } from '../abstraction'
 import { InterpreterCallback, INTERPRETERS } from '../private/interpreter'
 
 export const Reader: ReaderConstructor = class Reader<C extends ChunkTypeId = 'text'> implements IReader<C> {
     private readonly _onPushSubject: Subject<void> = new Subject()
     private readonly _bufferSubscription: Unsubscribable | null = null
-    private readonly _buffer: IoBuffer<C>
+    private readonly _buffer: IIoBuffer<C>
     get isCompleted(): boolean {
         return this._onPushSubject.closed
     }
@@ -23,7 +23,7 @@ export const Reader: ReaderConstructor = class Reader<C extends ChunkTypeId = 't
     }
     readonly onPush: Observable<void> = this._onPushSubject.asObservable()
 
-    constructor(buffer: IoBuffer<C>) {
+    constructor(buffer: IIoBuffer<C>) {
         this._buffer = buffer
         this._bufferSubscription = this._buffer.onPush.subscribe({
             next: () => this._onPushSubject.next(),
@@ -100,5 +100,5 @@ export const Reader: ReaderConstructor = class Reader<C extends ChunkTypeId = 't
 interface ReaderConstructor {
     readonly prototype: IReader<any>
 
-    new<C extends ChunkTypeId = 'text'>(buffer: IoBuffer<C>): IReader<C>
+    new<C extends ChunkTypeId = 'text'>(buffer: IIoBuffer<C>): IReader<C>
 }

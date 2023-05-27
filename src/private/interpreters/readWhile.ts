@@ -1,6 +1,6 @@
 import { Failure, Result, Success } from 'async-option'
 import { Unsubscribable } from 'rxjs'
-import { ChunkTypeId, ChunkItemTypeMap, ChunkTypeMap, IoBuffer, IReader, SimpleOperatorArgsTypeMap } from '../..'
+import { ChunkTypeId, ChunkItemTypeMap, ChunkTypeMap, IIoBuffer, IReader, SimpleOperatorArgsTypeMap } from '../..'
 import { EndOfStreamError } from '../../EndOfStreamError'
 import { getChunkItem, joinChunks } from '../../utils/chunk'
 import { GenericInterpreter, InterpreterCallback } from '../interpreter'
@@ -8,7 +8,7 @@ import { GenericInterpreter, InterpreterCallback } from '../interpreter'
 export const readWhile: GenericInterpreter<'readWhile'> = <C extends ChunkTypeId = 'text'>(
     args: SimpleOperatorArgsTypeMap[C]['readWhile'],
     reader: IReader<C>,
-    buffer: IoBuffer<C>,
+    buffer: IIoBuffer<C>,
     callback: InterpreterCallback<C>
 ): Result<ChunkTypeMap[C], Error> | null => {
     const condition = args.condition as (item: ChunkItemTypeMap[C]) => boolean
@@ -26,7 +26,7 @@ function body<C extends ChunkTypeId = 'text'>(
     inclusive: boolean,
     chunks: ChunkTypeMap[C][],
     reader: IReader<C>,
-    buffer: IoBuffer<C>,
+    buffer: IIoBuffer<C>,
     callback: InterpreterCallback<C>
 ): Result<ChunkTypeMap[C], Error> | null {
     while (true) {

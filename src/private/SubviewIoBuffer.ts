@@ -1,6 +1,6 @@
 import { Option } from 'async-option'
 import { Observable, Observer, Subscribable, Unsubscribable } from 'rxjs'
-import { IoBuffer, ChunkTypeId, ChunkTypeMap, IReader } from '..'
+import { IIoBuffer, ChunkTypeId, ChunkTypeMap, IReader } from '..'
 import { getEmptyChunk, joinChunks } from '../utils/chunk'
 import { Reader } from './Reader'
 
@@ -8,7 +8,7 @@ export type PeekCallback<C extends ChunkTypeId = 'text'> =
     (count: number | null, start: number, output: ChunkTypeMap[C][]) => number
 export type FirstCallback<C extends ChunkTypeId = 'text'> = (start: number) => Option<ChunkTypeMap[C]>
 
-export const SubviewIoBuffer: SubviewIoBufferConstructor = class SubviewIoBuffer<C extends ChunkTypeId = 'text'> implements IoBuffer<C> {
+export const SubviewIoBuffer: SubviewIoBufferConstructor = class SubviewIoBuffer<C extends ChunkTypeId = 'text'> implements IIoBuffer<C> {
     private _start: number
     get available(): number {
         return this._source.available - this._start
@@ -30,7 +30,7 @@ export const SubviewIoBuffer: SubviewIoBufferConstructor = class SubviewIoBuffer
     }
 
     constructor(
-        private readonly _source: IoBuffer<C>,
+        private readonly _source: IIoBuffer<C>,
         private readonly _peek: PeekCallback<C>,
         private readonly _first: FirstCallback<C>,
         start?: number | null
@@ -130,19 +130,19 @@ export const SubviewIoBuffer: SubviewIoBufferConstructor = class SubviewIoBuffer
     createReader(): IReader<C> {
         return new Reader(this)
     }
-    subview(start?: number | null): IoBuffer<C> {
+    subview(start?: number | null): IIoBuffer<C> {
         start = SubviewIoBuffer._checkStart(start)
 
         return this._source.subview(this._start + start)
     }
 }
 interface SubviewIoBufferConstructor {
-    readonly prototype: IoBuffer<any>
+    readonly prototype: IIoBuffer<any>
 
     new<C extends ChunkTypeId = 'text'>(
-        source: IoBuffer<C>,
+        source: IIoBuffer<C>,
         peek: PeekCallback<C>,
         first: FirstCallback<C>,
         start?: number | null
-    ): IoBuffer<C>
+    ): IIoBuffer<C>
 }

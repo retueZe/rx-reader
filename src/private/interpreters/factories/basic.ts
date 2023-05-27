@@ -1,12 +1,12 @@
 import { Failure, Success } from 'async-option'
 import type {  Unsubscribable } from 'rxjs'
-import type { ChunkTypeId, ChunkTypeMap, IoBuffer } from '../../..'
+import type { ChunkTypeId, ChunkTypeMap, IIoBuffer } from '../../..'
 import { EndOfStreamError } from '../../../EndOfStreamError'
 import type { GenericInterpreter } from '../../interpreter'
 
 export type BasicOperatorId = 'read' | 'peek' | 'skip'
 export type BasicInterpreterFactory = <I extends BasicOperatorId = BasicOperatorId>(
-    action: <C extends ChunkTypeId = 'text'>(buffer: IoBuffer<C>, count: number | null) => ChunkTypeMap[C]
+    action: <C extends ChunkTypeId = 'text'>(buffer: IIoBuffer<C>, count: number | null) => ChunkTypeMap[C]
 ) => GenericInterpreter<I>
 export const createBasicInterpreter: BasicInterpreterFactory = action => (args, reader, buffer, callback) => {
     const count = args.count
