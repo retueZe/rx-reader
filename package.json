@@ -17,14 +17,16 @@
     "url": "https://github.com/retueZe/async-reader"
   },
   "files": [
-    "dist"
+    "dist",
+    "operators",
+    "utils"
   ],
   "scripts": {
     "lint": "eslint .",
-    "build": "rollup -c",
+    "build:prod": "rollup -c",
     "build:dev": "tsc --outDir dist --inlineSourceMap --module commonjs",
-    "clean": "rm -rf dist",
-    "prepare": "npm run clean && npm run build",
+    "clean": "rm -rf dist operators utils",
+    "prepare": "npm run clean && npm run build:prod",
     "postpublish": "npm run clean"
   },
   "devDependencies": {
