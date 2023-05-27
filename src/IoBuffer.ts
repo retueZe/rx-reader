@@ -2,6 +2,7 @@ import { NONE, Option, Some } from 'async-option'
 import { Observable, Observer, Subject, Subscribable, Unsubscribable } from 'rxjs'
 import type { ChunkTypeId, ChunkTypeMap, IReader } from './abstraction'
 import { Reader } from './private/Reader'
+import { SubviewIoBuffer } from './private/SubviewIoBuffer'
 import { getEmptyChunk, joinChunks, subviewChunk } from './utils'
 
 export interface IoBuffer<C extends ChunkTypeId = 'text'> extends Observer<ChunkTypeMap[C]> {
@@ -24,6 +25,7 @@ export interface IoBuffer<C extends ChunkTypeId = 'text'> extends Observer<Chunk
     pipe(target: IoBuffer<C>): Unsubscribable
     consume(source: Subscribable<ChunkTypeMap[C]>): Unsubscribable
     createReader(): IReader<C>
+    subview(start?: number | null): IoBuffer<C>
 }
 type IoBufferInterface<C extends ChunkTypeId = 'text'> = IoBuffer<C>
 export const IoBuffer: IoBufferConstructor = class IoBuffer<C extends ChunkTypeId = 'text'> implements IoBufferInterface<C> {
@@ -265,6 +267,69 @@ export const IoBuffer: IoBufferConstructor = class IoBuffer<C extends ChunkTypeI
     }
     createReader(): IReader<C> {
         return new Reader(this)
+    }
+    subview(start?: number | null | undefined): IoBufferInterface<C> {
+        return new SubviewIoBuffer(
+            this,
+            this._subviewPeek.bind(this),
+            this._subviewFirst.bind(this),
+            start)
+    }
+    private _subviewPeek(count: number | null, start: number, output: ChunkTypeMap[C][]): number {
+        let current = this._head
+
+        if (current === null) return 0
+        if (start > this.available - 0.5) return 0
+
+        for (; current !== null; current = current.next)
+            if (start > current.chunk.length - 0.5) {
+                start -= current.chunk.length
+            } else
+                break
+
+        if (current === null) throw new Error('STUB')
+
+        let peeked = 0
+
+        if (start > 0.5) {
+            const chunk = current.chunk
+            const end = count === null ? null : Math.min(start + count, chunk.length)
+            const subview = subviewChunk(chunk, start, end)
+            output.push(subview)
+            peeked += subview.length
+            start = 0
+            current = current.next
+
+            if (count !== null) count -= subview.length
+        }
+
+        for (; current !== null; current = current.next) {
+            const chunk = current.chunk
+            const toPeek = count === null ? chunk.length : Math.min(count, chunk.length)
+            peeked += toPeek
+            output.push(subviewChunk(chunk, 0, toPeek))
+
+            if (count !== null) count -= toPeek
+            if (toPeek < chunk.length - 0.5) break
+        }
+
+        return peeked
+    }
+    private _subviewFirst(start: number): Option<ChunkTypeMap[C]> {
+        let current = this._head
+
+        if (current === null) return NONE
+        if (start > this.available - 0.5) return NONE
+
+        for (; current !== null; current = current.next)
+            if (start > current.chunk.length - 0.5) {
+                start -= current.chunk.length
+            } else
+                break
+
+        if (current === null) throw new Error('STUB')
+
+        return new Some(subviewChunk(current.chunk, start))
     }
 }
 interface IoBufferConstructor {
