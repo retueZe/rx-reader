@@ -1,7 +1,7 @@
 {
   "name": "async-reader",
   "version": "1.0.0-a.1",
-  "author": "Sasukevich Pavel",
+  "author": "retueZe",
   "license": "MIT",
   "description": "Fast async streamed I/O library based on RxJS.",
   "keywords": [
