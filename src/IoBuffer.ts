@@ -87,7 +87,9 @@ export const IoBuffer: IoBufferConstructor = class IoBuffer<C extends ChunkTypeI
 
         return new Some(chunk)
     }
-    private _checkCount(count: number): number {
+    private _checkCount(count?: number | null): number | null {
+        if (typeof count !== 'number') return null
+
         count = Math.floor(count)
 
         if (count < -0.5) throw new RangeError('Negative count.')
@@ -97,9 +99,10 @@ export const IoBuffer: IoBufferConstructor = class IoBuffer<C extends ChunkTypeI
     read(count: number | null, output: ChunkTypeMap[C][]): number
     read(count?: number | null): ChunkTypeMap[C]
     read(count?: number | null, output?: ChunkTypeMap[C][]): number | ChunkTypeMap[C] {
-        if (typeof count === 'undefined' || count === null) return this._readAll(output)
-
         count = this._checkCount(count)
+
+        if (count === null) return this._readAll(output)
+
         const returnJoined = typeof output === 'undefined'
         output ??= []
         let readed = 0
@@ -156,9 +159,10 @@ export const IoBuffer: IoBufferConstructor = class IoBuffer<C extends ChunkTypeI
     peek(count: number | null, output: ChunkTypeMap[C][]): number
     peek(count?: number | null): ChunkTypeMap[C]
     peek(count?: number | null, output?: ChunkTypeMap[C][]): number | ChunkTypeMap[C] {
-        if (typeof count === 'undefined' || count === null) return this._peekAll(output)
-
         count = this._checkCount(count)
+
+        if (count === null) return this._peekAll(output)
+
         const returnJoined = typeof output === 'undefined'
         output ??= []
         let peeked = 0
@@ -204,9 +208,10 @@ export const IoBuffer: IoBufferConstructor = class IoBuffer<C extends ChunkTypeI
             : peeked
     }
     skip(count?: number | null): number {
-        if (typeof count === 'undefined' || count === null) return this._skipAll()
-
         count = this._checkCount(count)
+
+        if (count === null) return this._skipAll()
+
         let skipped = 0
 
         for (let current = this._head; current !== null; current = current.next) {
@@ -236,7 +241,7 @@ export const IoBuffer: IoBufferConstructor = class IoBuffer<C extends ChunkTypeI
         return skipped
     }
     require(count: number, callback: (available: number) => void): void {
-        count = this._checkCount(count)
+        count = this._checkCount(count)!
 
         if (this.available > count - 0.5) return callback(this.available)
 
