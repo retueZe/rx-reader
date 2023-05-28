@@ -1,8 +1,18 @@
 import type { ChunkTypeId, SimpleOperator } from '../abstraction'
 
-export function skip(count?: number | null): SimpleOperator<ChunkTypeId, 'skip'> {
+export type SkipOptions = {
+    strict?: boolean | null
+}
+
+export function skip<C extends ChunkTypeId = 'text'>(
+    count?: number | null,
+    options?: Readonly<SkipOptions> | null
+): SimpleOperator<C, 'skip'> {
     return {
         id: 'skip',
-        args: {count: count ?? null}
+        args: {
+            count: count ?? null,
+            strict: options?.strict ?? true
+        }
     }
 }

@@ -10,6 +10,7 @@ export type BasicInterpreterFactory = <I extends BasicOperatorId = BasicOperator
 ) => GenericInterpreter<I>
 export const createBasicInterpreter: BasicInterpreterFactory = action => (args, reader, buffer, callback) => {
     const count = args.count
+    const strict = args.strict
 
     if (count === null) {
         if (reader.isCompleted) return new Success(action(buffer, null))
@@ -22,7 +23,9 @@ export const createBasicInterpreter: BasicInterpreterFactory = action => (args, 
         return null
     }
     if (count < reader.available + 0.5) return new Success(action(buffer, count))
-    if (reader.isCompleted) return new Failure(new EndOfStreamError())
+    if (reader.isCompleted) return strict
+        ? new Failure(new EndOfStreamError())
+        : new Success(action(buffer, null))
 
     let subscription: Unsubscribable | null = null
     subscription = reader.onPush.subscribe({
@@ -33,7 +36,9 @@ export const createBasicInterpreter: BasicInterpreterFactory = action => (args, 
             callback(new Success(action(buffer, count)))
         },
         error: error => callback(new Failure(error)),
-        complete: () => callback(new Failure(new EndOfStreamError()))
+        complete: () => callback(strict
+            ? new Failure(new EndOfStreamError())
+            : new Success(action(buffer, null)))
     })
 
     return null

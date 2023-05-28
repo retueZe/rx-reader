@@ -3,9 +3,9 @@ import type { AsyncResult } from 'async-option/async'
 import type { Observable, Unsubscribable } from 'rxjs'
 
 export type SimpleGenericOperatorArgsTypeMap = {
-    read: Readonly<{count: number | null}>
-    peek: Readonly<{count: number | null}>
-    skip: Readonly<{count: number | null}>
+    read: Readonly<{count: number | null, strict: boolean}>
+    peek: Readonly<{count: number | null, strict: boolean}>
+    skip: Readonly<{count: number | null, strict: boolean}>
 }
 export type SimpleTextOperatorArgsTypeMap = SimpleGenericOperatorArgsTypeMap & {
     readWhile: Readonly<{condition: (char: string) => boolean, limit: number | null, inclusive: boolean}>
