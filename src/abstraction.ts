@@ -50,7 +50,6 @@ export type SimpleOperatorIterator<O, E = unknown, C extends ChunkTypeId = 'text
     Generator<Readonly<SimpleOperator<C>>, Result<O, E>, ChunkTypeMap[C]>
 
 export interface IReader<C extends ChunkTypeId = 'text'> extends Unsubscribable {
-    readonly available: number
     readonly chunkTypeId: C
     readonly isCompleted: boolean
     readonly isBinary: boolean

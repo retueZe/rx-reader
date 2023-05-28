@@ -12,9 +12,6 @@ export const Reader: ReaderConstructor = class Reader<C extends ChunkTypeId = 't
     get isCompleted(): boolean {
         return this._onPushSubject.closed
     }
-    get available(): number {
-        return this._buffer.available
-    }
     get chunkTypeId(): C {
         return this._buffer.chunkTypeId
     }

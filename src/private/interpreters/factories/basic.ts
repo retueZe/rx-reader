@@ -22,7 +22,7 @@ export const createBasicInterpreter: BasicInterpreterFactory = action => (args, 
 
         return null
     }
-    if (count < reader.available + 0.5) return new Success(action(buffer, count))
+    if (count < buffer.available + 0.5) return new Success(action(buffer, count))
     if (reader.isCompleted) return strict
         ? new Failure(new EndOfStreamError())
         : new Success(action(buffer, null))
@@ -30,7 +30,7 @@ export const createBasicInterpreter: BasicInterpreterFactory = action => (args, 
     let subscription: Unsubscribable | null = null
     subscription = reader.onPush.subscribe({
         next: () => {
-            if (count > reader.available + 0.5) return
+            if (count > buffer.available + 0.5) return
             if (subscription !== null) subscription.unsubscribe()
 
             callback(new Success(action(buffer, count)))
