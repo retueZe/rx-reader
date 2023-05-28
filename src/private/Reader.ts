@@ -1,5 +1,5 @@
 import type { Result } from 'async-option'
-import type { AsyncResult } from 'async-option/async'
+import { AsyncResult } from 'async-option/async'
 import { Observable, Subject, Unsubscribable } from 'rxjs'
 import type { IIoBuffer } from '../IoBuffer'
 import type { ChunkTypeId, ChunkTypeMap, SimpleOperator, ComplexOperator, SimpleOperatorIterator, IReader } from '../abstraction'
@@ -48,7 +48,8 @@ export const Reader: ReaderConstructor = class Reader<C extends ChunkTypeId = 't
     read<O, E>(operator: ComplexOperator<O, E, C>): AsyncResult<O, E>
     read(operator: SimpleOperator<C> | ComplexOperator<unknown, unknown, C>): Promise<unknown> {
         return typeof operator === 'function'
-            ? new Promise((resolve, reject) => this._interpretComplexOperator(operator(), resolve, reject))
+            ? new AsyncResult(new Promise<Result<unknown>>((resolve, reject) =>
+                this._interpretComplexOperator(operator(), resolve, reject)))
             : new Promise((resolve, reject) => {
                 const callback = Reader._makeInterpreterCallback<C>(resolve, reject)
                 const result = this._interpretSimpleOperator(operator, callback)
