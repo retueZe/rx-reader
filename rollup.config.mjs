@@ -55,7 +55,7 @@ function createNamespace(namespacePath) {
     let package_json = PACKAGE_JSON_IN
     const variables = {
         NSPATH: namespacePath,
-        PKGNAME: 'async-reader',
+        PKGNAME: 'rx-reader',
         INSTALLDIR: Array.from(namespacePath.split('/'), () => '..').join('/')
     }
 

@@ -1,10 +1,10 @@
-# `async-reader`
+# `rx-reader`
 
 This package provides an API that improves I/O performance.
 
 *This package will show its advantages as far as receiving chunks of data gets larger and the amount of reading operation increases.*
 
-## Why `async-reader`?
+## Why `rx-reader`?
 
 There are already several (asynchronous) APIs designed to solve the same problem:
 
@@ -23,8 +23,8 @@ Since our I/O is based on interrupting (pushing), the best solution was to use t
 ## Getting started
 
 ```javascript
-import { IoBuffer } from 'async-reader'
-import { demand, peek, readWhile, skipWhitespaces } from 'async-reader/operators'
+import { IoBuffer } from 'rx-reader'
+import { demand, peek, readWhile, skipWhitespaces } from 'rx-reader/operators'
 import { Failure, Success } from 'async-option'
 import { of } from 'rxjs'
 

@@ -1,9 +1,10 @@
 {
-  "name": "async-reader",
+  "private": true,
+  "name": "rx-reader",
   "version": "1.0.0-b.1",
-  "author": "retueZe",
+  "author": "retueze",
   "license": "MIT",
-  "description": "Fast async streamed I/O library based on RxJS.",
+  "description": "Fast async streamed I/O library based on RxJS and generators.",
   "keywords": [
     "async",
     "stream",
@@ -11,11 +12,12 @@
     "streamed",
     "io",
     "reader",
-    "rxjs"
+    "rxjs",
+    "generator"
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/retueZe/async-reader"
+    "url": "https://github.com/retueZe/rx-reader"
   },
   "files": [
     "dist",
