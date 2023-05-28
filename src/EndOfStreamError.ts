@@ -1,3 +1,4 @@
+/** @since v1.0.0 */
 export const EndOfStreamError: EndOfStreamErrorConstructor = class EndOfStreamError extends Error {
     static readonly DEFAULT_MESSAGE = 'End of stream has been reached.'
 
@@ -7,8 +8,11 @@ export const EndOfStreamError: EndOfStreamErrorConstructor = class EndOfStreamEr
     }
 }
 interface EndOfStreamErrorConstructor {
+    /** @since v1.0.0 */
     readonly prototype: Error
+    /** @since v1.0.0 */
     readonly DEFAULT_MESSAGE: string
 
+    /** @since v1.0.0 */
     new(message?: string | null, options?: ErrorOptions | null): Error
 }

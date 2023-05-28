@@ -5,28 +5,71 @@ import { Reader } from './private/Reader'
 import { SubviewIoBuffer } from './private/SubviewIoBuffer'
 import { getEmptyChunk, joinChunks, subviewChunk } from './utils'
 
+/** @since v1.0.0 */
 export interface IIoBuffer<C extends ChunkTypeId = 'text'> extends Observer<ChunkTypeMap[C]> {
+    /** @since v1.0.0 */
     readonly available: number
+    /** @since v1.0.0 */
     readonly chunkTypeId: C
+    /** @since v1.0.0 */
     readonly isBinary: boolean
+    /** @since v1.0.0 */
     readonly isEmpty: boolean
+    /** @since v1.0.0 */
     readonly isCompleted: boolean
+    /** @since v1.0.0 */
     readonly onPush: Observable<ChunkTypeMap[C]>
 
+    /** @since v1.0.0 */
     next(chunk: ChunkTypeMap[C]): this
+    /**
+     * Returns the first chunk and removes it from the buffer.
+     * @since v1.0.0
+     */
     shift(): Option<ChunkTypeMap[C]>
+    /**
+     * Returns fhe first chunk without any removal.
+     * @since v1.0.0
+     */
     first(): Option<ChunkTypeMap[C]>
+    /**
+     * Reads desired amount of items and pushes read chunks into the `output` array.
+     * @since v1.0.0
+     */
     read(count: number | null, output: ChunkTypeMap[C][]): number
+    /** @since v1.0.0 */
     read(count?: number | null): ChunkTypeMap[C]
+    /**
+     * Peeks desired amount of items and pushes read chunks into the `output` array.
+     * @since v1.0.0
+     */
     peek(count: number | null, output: ChunkTypeMap[C][]): number
+    /** @since v1.0.0 */
     peek(count?: number | null): ChunkTypeMap[C]
+    /** @since v1.0.0 */
     skip(count?: number | null): number
+    /**
+     * If the number of available items is greater than or equal to `count`, then calls the `callback` immediately; otherwise subscribes to `onPush` event and waits until the condition passes.
+     * @since v1.0.0
+     */
     require(count: number, callback: (available: number) => void): void
-    pipe(target: IIoBuffer<C>): Unsubscribable
+    /** Forwards the input of `next` and `error` method to the `target`
+     * @since v1.0.0
+     */
+    pipe(target: Observer<ChunkTypeMap[C]>): Unsubscribable
+    /** Consumes chunks from the `source`, ignoring the fact of its completion.
+     * @since v1.0.0
+     */
     consume(source: Subscribable<ChunkTypeMap[C]>): Unsubscribable
+    /** @since v1.0.0 */
     createReader(): IReader<C>
+    /**
+     * Returns a subview of the current buffer. The source buffer may not be affected by the actions of the subview. The `onPush` event is forwarded, the data manipulation methods affect only an internal index property, the read data from the perspective of the subview is peeked data from the perspective of the source.
+     * @since v1.0.0
+     */
     subview(start?: number | null): IIoBuffer<C>
 }
+/** @since v1.0.0 */
 export const IoBuffer: IoBufferConstructor = class IoBuffer<C extends ChunkTypeId = 'text'> implements IIoBuffer<C> {
     private readonly _onPushSubject = new Subject<ChunkTypeMap[C]>()
     private _head: ChunkNode<C> | null = null
@@ -332,8 +375,10 @@ export const IoBuffer: IoBufferConstructor = class IoBuffer<C extends ChunkTypeI
     }
 }
 interface IoBufferConstructor {
+    /** @since v1.0.0 */
     readonly prototype: IIoBuffer<any>
 
+    /** @since v1.0.0 */
     new<C extends ChunkTypeId = 'text'>(chunkTypeId: C): IIoBuffer<C>
 }
 

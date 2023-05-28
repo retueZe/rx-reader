@@ -1,11 +1,13 @@
 import type { ChunkItemTypeMap, ChunkTypeId, ChunkTypeMap } from '..'
 
+/** @since v1.0.0 */
 export type ChunkTypeIdFromChunkType<C> = C extends string
     ? 'text'
     : C extends Uint8Array
         ? 'binary'
         : never
 
+/** @since v1.0.0 */
 export function subviewChunk<C extends ChunkTypeId>(
     chunk: ChunkTypeMap[C],
     start?: number | null,
@@ -15,6 +17,7 @@ export function subviewChunk<C extends ChunkTypeId>(
         ? chunk.slice(start ?? 0, end ?? chunk.length) as ChunkTypeMap[C]
         : chunk.subarray(start ?? 0, end ?? chunk.length) as ChunkTypeMap[C]
 }
+/** @since v1.0.0 */
 export function joinChunks<C extends ChunkTypeId>(
     first: ChunkTypeMap[C],
     ...chunks: ChunkTypeMap[C][]
@@ -36,14 +39,17 @@ export function joinChunks<C extends ChunkTypeId>(
 
     return merged as ChunkTypeMap[C]
 }
+/** @since v1.0.0 */
 export function getEmptyChunk<C extends ChunkTypeId>(typeId: C): ChunkTypeMap[C] {
     return typeId === 'text'
         ? '' as ChunkTypeMap[C]
         : new Uint8Array() as ChunkTypeMap[C]
 }
+/** @since v1.0.0 */
 export function getChunkItem<C extends ChunkTypeId>(chunk: ChunkTypeMap[C], i: number): ChunkItemTypeMap[C] {
     return chunk[i] as ChunkItemTypeMap[C]
 }
+/** @since v1.0.0 */
 export function areChunksEqual<C extends ChunkTypeId>(left: ChunkTypeMap[C], right: ChunkTypeMap[C]): boolean {
     return typeof left === 'string' || typeof right === 'string'
         ? left === right
