@@ -1,6 +1,6 @@
 {
   "name": "async-reader",
-  "version": "1.0.0-a.1",
+  "version": "1.0.0-b.1",
   "author": "retueZe",
   "license": "MIT",
   "description": "Fast async streamed I/O library based on RxJS.",
