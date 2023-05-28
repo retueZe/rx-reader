@@ -44,3 +44,9 @@ export function getEmptyChunk<C extends ChunkTypeId>(typeId: C): ChunkTypeMap[C]
 export function getChunkItem<C extends ChunkTypeId>(chunk: ChunkTypeMap[C], i: number): ChunkItemTypeMap[C] {
     return chunk[i] as ChunkItemTypeMap[C]
 }
+export function areChunksEqual<C extends ChunkTypeId>(left: ChunkTypeMap[C], right: ChunkTypeMap[C]): boolean {
+    return typeof left === 'string' || typeof right === 'string'
+        ? left === right
+        : Math.abs(left.length - right.length) < 0.5 &&
+            left.every((byte, i) => Math.abs(byte - right[i]) < 0.5)
+}
