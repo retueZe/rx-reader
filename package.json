@@ -1,7 +1,7 @@
 {
   "private": true,
   "name": "rx-reader",
-  "version": "1.0.0-b.1",
+  "version": "1.0.0-b.2",
   "author": "retueze",
   "license": "MIT",
   "description": "Fast async streamed I/O library based on RxJS and generators.",
@@ -24,6 +24,26 @@
     "operators",
     "utils"
   ],
+  "module": "dist/index.mjs",
+  "main": "dist/index.cjs",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs",
+      "types": "./dist/index.d.ts"
+    },
+    "./operators": {
+      "import": "./dist/operators.mjs",
+      "require": "./dist/operators.cjs",
+      "types": "./dist/operators.d.ts"
+    },
+    "./utils": {
+      "import": "./dist/utils.mjs",
+      "require": "./dist/utils.cjs",
+      "types": "./dist/utils.d.ts"
+    }
+  },
   "scripts": {
     "lint": "eslint .",
     "build:prod": "rollup -c",
