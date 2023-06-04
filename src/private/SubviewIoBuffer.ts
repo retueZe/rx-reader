@@ -1,6 +1,6 @@
-import { Option } from 'async-option'
-import { Observable, Observer, Subscribable, Unsubscribable } from 'rxjs'
-import { IIoBuffer, ChunkTypeId, ChunkTypeMap, IReader } from '..'
+import type { Option } from 'async-option'
+import type { Observable, Observer, Subscribable, Unsubscribable } from 'rxjs'
+import type { IIoBuffer, ChunkTypeId, ChunkTypeMap, IReader } from '..'
 import { getEmptyChunk, joinChunks } from '../utils/chunk'
 import { Reader } from './Reader'
 

@@ -1,15 +1,15 @@
 import { Failure, Result, Success } from 'async-option'
-import { SimpleOperatorIterator } from '../abstraction'
+import { ChunkTypeId, SimpleOperatorIterator } from '../abstraction'
 import { wait } from './wait'
 
 export type CallOptions = {
     throwOnReject?: boolean | null
 }
 
-export function* call<T, E = unknown>(
+export function* call<T, E = unknown, C extends ChunkTypeId = 'text'>(
     promise: Promise<T>,
     options?: Readonly<CallOptions> | null
-): SimpleOperatorIterator<T, E> {
+): SimpleOperatorIterator<T, E, C> {
     const throwOnReject = options?.throwOnReject ?? true
     let result = null as Result<T, any> | null
     const continuation = promise.then(

@@ -2,12 +2,14 @@ import { Failure, Result, Success } from 'async-option'
 import { Unsubscribable } from 'rxjs'
 import { ChunkTypeId, ChunkItemTypeMap, ChunkTypeMap, EndOfStreamError, IIoBuffer, IReader, SimpleOperatorArgsTypeMap } from '../..'
 import { getChunkItem, getEmptyChunk } from '../../utils'
+import { ContextCollection } from '../ContextCollection'
 import { GenericInterpreter, InterpreterCallback } from '../interpreter'
 
 export const skipWhile: GenericInterpreter<'skipWhile'> = <C extends ChunkTypeId = 'text'>(
     args: SimpleOperatorArgsTypeMap[C]['skipWhile'],
     reader: IReader<C>,
     buffer: IIoBuffer<C>,
+    contexts: ContextCollection,
     callback: InterpreterCallback<C>
 ): Result<ChunkTypeMap[C], Error> | null => {
     const condition = args.condition as (item: ChunkItemTypeMap[C]) => boolean

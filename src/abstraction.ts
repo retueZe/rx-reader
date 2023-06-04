@@ -1,4 +1,4 @@
-import type { Result } from 'async-option'
+import type { Option, Result } from 'async-option'
 import type { AsyncResult } from 'async-option/async'
 import type { Observable, Unsubscribable } from 'rxjs'
 
@@ -12,6 +12,14 @@ export type SimpleGenericOperatorArgsTypeMap = {
     skip: Readonly<{count: number | null, strict: boolean}>
     /** @since v1.0.0 */
     wait: Readonly<{promise: Promise<any>}>
+    /** @since v1.0.0 */
+    pushContext: Readonly<{context: any}>
+    /** @since v1.0.0 */
+    setContext: Readonly<{context: any}>
+    /** @since v1.0.0 */
+    unsetContext: Readonly<{constructor: ContextConstructor}>
+    /** @since v1.0.0 */
+    getContext: Readonly<{constructor: ContextConstructor, mutable: boolean, retain: boolean, target: {context: Option<any>}}>
 }
 /** @since v1.0.0 */
 export type SimpleTextOperatorArgsTypeMap = SimpleGenericOperatorArgsTypeMap & {
@@ -96,5 +104,9 @@ export interface IReader<C extends ChunkTypeId = 'text'> extends Unsubscribable 
     /** @since v1.0.0 */
     read(operator: SimpleOperator<C>): Promise<ChunkTypeMap[C]>
     /** @since v1.0.0 */
-    read<O, E>(operator: ComplexOperator<O, E, C>): AsyncResult<O, E>
+    read<O, E>(operator: ComplexOperator<O, E, C>, contexts?: Iterable<any> | null): AsyncResult<O, E>
+}
+
+export interface ContextConstructor<C = any> {
+    readonly prototype: C
 }

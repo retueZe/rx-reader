@@ -4,6 +4,7 @@ import { Observable, Subject, Unsubscribable } from 'rxjs'
 import type { IIoBuffer } from '../IoBuffer'
 import type { ChunkTypeId, ChunkTypeMap, SimpleOperator, ComplexOperator, SimpleOperatorIterator, IReader } from '../abstraction'
 import { InterpreterCallback, INTERPRETERS } from '../private/interpreter'
+import { ContextCollection } from './ContextCollection'
 
 export class Reader<C extends ChunkTypeId = 'text'> implements IReader<C> {
     private readonly _onPushSubject: Subject<void> = new Subject()
@@ -42,11 +43,20 @@ export class Reader<C extends ChunkTypeId = 'text'> implements IReader<C> {
         this._onPushSubject.complete()
     }
     read(operator: SimpleOperator<C>): Promise<ChunkTypeMap[C]>
-    read<O, E>(operator: ComplexOperator<O, E, C>): AsyncResult<O, E>
-    read(operator: SimpleOperator<C> | ComplexOperator<unknown, unknown, C>): Promise<unknown> {
+    read<O, E>(operator: ComplexOperator<O, E, C>, contexts?: Iterable<any> | null): AsyncResult<O, E>
+    read(
+        operator: SimpleOperator<C> | ComplexOperator<unknown, unknown, C>,
+        contexts?: Iterable<any> | null
+    ): Promise<unknown> {
+        const contextCollection = new ContextCollection()
+
+        if (typeof contexts !== 'undefined' && contexts !== null)
+            for (const context of contexts)
+                contextCollection.set(context)
+
         return typeof operator === 'function'
             ? new AsyncResult(new Promise<Result<unknown>>((resolve, reject) =>
-                this._interpretComplexOperator(operator(), resolve, reject)))
+                this._interpretComplexOperator(operator(), resolve, reject, contextCollection)))
             : new Promise((resolve, reject) => {
                 const callback = Reader._makeInterpreterCallback<C>(resolve, reject)
                 const result = this._interpretSimpleOperator(operator, callback)
@@ -64,18 +74,23 @@ export class Reader<C extends ChunkTypeId = 'text'> implements IReader<C> {
     }
     private _interpretSimpleOperator(
         operator: SimpleOperator<C>,
-        callback: InterpreterCallback<C>
+        callback: InterpreterCallback<C>,
+        contexts?: ContextCollection | null
     ): Result<ChunkTypeMap[C], Error> | null {
+        contexts ??= new ContextCollection()
+
         // TODO
-        return INTERPRETERS[this.chunkTypeId][operator.id](operator.args as any, this, this._buffer, callback)
+        return INTERPRETERS[this.chunkTypeId][operator.id](operator.args as any, this, this._buffer, contexts, callback)
     }
     private _interpretComplexOperator(
         iterator: SimpleOperatorIterator<unknown, unknown, C>,
         resolve: (result: Result<unknown>) => void,
         reject: (error: Error) => void,
+        contexts?: ContextCollection | null,
         chunk?: Result<ChunkTypeMap[C], Error> | null,
     ): void {
-        const boundInterpreter = this._interpretComplexOperator.bind(this, iterator, resolve, reject)
+        contexts ??= new ContextCollection()
+        const boundInterpreter = this._interpretComplexOperator.bind(this, iterator, resolve, reject, contexts)
 
         while (true) {
             if (typeof chunk !== 'undefined' && chunk !== null && !chunk.isSucceeded)
@@ -88,7 +103,7 @@ export class Reader<C extends ChunkTypeId = 'text'> implements IReader<C> {
             if (done ?? false) return resolve(value as Result<unknown>)
 
             const operator = value
-            const interpreterResult = this._interpretSimpleOperator(operator, boundInterpreter)
+            const interpreterResult = this._interpretSimpleOperator(operator, boundInterpreter, contexts)
             chunk = interpreterResult
 
             if (chunk === null) break

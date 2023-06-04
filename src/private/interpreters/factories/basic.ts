@@ -8,7 +8,7 @@ export type BasicOperatorId = 'read' | 'peek' | 'skip'
 export type BasicInterpreterFactory = <I extends BasicOperatorId = BasicOperatorId>(
     action: <C extends ChunkTypeId = 'text'>(buffer: IIoBuffer<C>, count: number | null) => ChunkTypeMap[C]
 ) => GenericInterpreter<I>
-export const createBasicInterpreter: BasicInterpreterFactory = action => (args, reader, buffer, callback) => {
+export const createBasicInterpreter: BasicInterpreterFactory = action => (args, reader, buffer, contexts, callback) => {
     const count = args.count
     const strict = args.strict
 
