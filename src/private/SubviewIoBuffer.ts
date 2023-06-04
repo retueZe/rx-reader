@@ -8,7 +8,7 @@ export type PeekCallback<C extends ChunkTypeId = 'text'> =
     (count: number | null, start: number, output: ChunkTypeMap[C][]) => number
 export type FirstCallback<C extends ChunkTypeId = 'text'> = (start: number) => Option<ChunkTypeMap[C]>
 
-export const SubviewIoBuffer: SubviewIoBufferConstructor = class SubviewIoBuffer<C extends ChunkTypeId = 'text'> implements IIoBuffer<C> {
+export class SubviewIoBuffer<C extends ChunkTypeId = 'text'> implements IIoBuffer<C> {
     private _start: number
     get available(): number {
         return this._source.available - this._start
@@ -135,14 +135,4 @@ export const SubviewIoBuffer: SubviewIoBufferConstructor = class SubviewIoBuffer
 
         return this._source.subview(this._start + start)
     }
-}
-interface SubviewIoBufferConstructor {
-    readonly prototype: IIoBuffer<any>
-
-    new<C extends ChunkTypeId = 'text'>(
-        source: IIoBuffer<C>,
-        peek: PeekCallback<C>,
-        first: FirstCallback<C>,
-        start?: number | null
-    ): IIoBuffer<C>
 }

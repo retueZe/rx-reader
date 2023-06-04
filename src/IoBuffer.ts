@@ -70,7 +70,7 @@ export interface IIoBuffer<C extends ChunkTypeId = 'text'> extends Observer<Chun
     subview(start?: number | null): IIoBuffer<C>
 }
 /** @since v1.0.0 */
-export const IoBuffer: IoBufferConstructor = class IoBuffer<C extends ChunkTypeId = 'text'> implements IIoBuffer<C> {
+export class IoBuffer<C extends ChunkTypeId = 'text'> implements IIoBuffer<C> {
     private readonly _onPushSubject = new Subject<ChunkTypeMap[C]>()
     private _head: ChunkNode<C> | null = null
     private _tail: ChunkNode<C> | null = null
@@ -373,13 +373,6 @@ export const IoBuffer: IoBufferConstructor = class IoBuffer<C extends ChunkTypeI
 
         return new Some(subviewChunk(current.chunk, start))
     }
-}
-interface IoBufferConstructor {
-    /** @since v1.0.0 */
-    readonly prototype: IIoBuffer<any>
-
-    /** @since v1.0.0 */
-    new<C extends ChunkTypeId = 'text'>(chunkTypeId: C): IIoBuffer<C>
 }
 
 type ChunkNode<C extends ChunkTypeId = 'text'> = {

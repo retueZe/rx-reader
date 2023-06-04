@@ -5,7 +5,7 @@ import type { IIoBuffer } from '../IoBuffer'
 import type { ChunkTypeId, ChunkTypeMap, SimpleOperator, ComplexOperator, SimpleOperatorIterator, IReader } from '../abstraction'
 import { InterpreterCallback, INTERPRETERS } from '../private/interpreter'
 
-export const Reader: ReaderConstructor = class Reader<C extends ChunkTypeId = 'text'> implements IReader<C> {
+export class Reader<C extends ChunkTypeId = 'text'> implements IReader<C> {
     private readonly _onPushSubject: Subject<void> = new Subject()
     private readonly _bufferSubscription: Unsubscribable | null = null
     private readonly _buffer: IIoBuffer<C>
@@ -94,9 +94,4 @@ export const Reader: ReaderConstructor = class Reader<C extends ChunkTypeId = 't
             if (chunk === null) break
         }
     }
-}
-interface ReaderConstructor {
-    readonly prototype: IReader<any>
-
-    new<C extends ChunkTypeId = 'text'>(buffer: IIoBuffer<C>): IReader<C>
 }
