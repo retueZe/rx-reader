@@ -1,5 +1,6 @@
 import { Failure, Result, Success } from 'async-option'
 import { SimpleOperatorIterator } from '../abstraction'
+import { wait } from './wait'
 
 export type CallOptions = {
     throwOnReject?: boolean | null
@@ -15,7 +16,7 @@ export function* call<T, E = unknown>(
         value => result = new Success(value),
         error => result = new Failure(error))
 
-    yield {id: 'wait', args: {promise: continuation}}
+    yield wait(continuation)
 
     if (result === null) throw new Error('STUB')
     if (throwOnReject && result.isSucceeded) throw result.error

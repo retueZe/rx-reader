@@ -20,6 +20,6 @@ export function read<C extends ChunkTypeId = 'text'>(
         args: {
             count: count ?? null,
             strict: options?.strict ?? true
-        },
+        }
     }
 }
