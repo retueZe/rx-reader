@@ -10,6 +10,8 @@ export type SimpleGenericOperatorArgsTypeMap = {
     peek: Readonly<{count: number | null, strict: boolean}>
     /** @since v1.0.0 */
     skip: Readonly<{count: number | null, strict: boolean}>
+    /** @since v1.0.0 */
+    wait: Readonly<{promise: Promise<any>}>
 }
 /** @since v1.0.0 */
 export type SimpleTextOperatorArgsTypeMap = SimpleGenericOperatorArgsTypeMap & {
