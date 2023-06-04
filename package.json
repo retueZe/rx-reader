@@ -1,7 +1,7 @@
 {
   "private": true,
   "name": "rx-reader",
-  "version": "1.0.0-b.3",
+  "version": "1.0.0-b.4",
   "author": "retueze",
   "license": "MIT",
   "description": "Fast async streamed I/O library based on RxJS and generators.",
