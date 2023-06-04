@@ -47,8 +47,6 @@ function applyDefaultConfig(config) {
     }
 }
 function insertVariable(content, variableName, value) {
-    console.log(content)
-
     return content.replaceAll(`<(${variableName})`, value)
 }
 function createNamespace(namespacePath) {

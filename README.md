@@ -1,6 +1,6 @@
 # `rx-reader`
 
-This package provides an API that improves I/O performance.
+Fast async streamed I/O library based on RxJS and generators.
 
 ## Why `rx-reader`?
 
@@ -57,7 +57,7 @@ function* lineParser() {
     return new Success({name, value})
 }
 
-// you may enter tour input here to see the reaction
+// you may enter your input here to see the reaction
 const INPUT = '  First  :  some value  \r\n  Second  :another value\r\n'
 
 const buffer = new IoBuffer('text')
@@ -81,6 +81,6 @@ In this code are shown following advantages of this package:
 
 1. Asynchronous (buffer consumes and completes data after the read routine being called);
 2. Extensible (operators can be used inside other operators; you may create your own operators);
-3. Flexibility (operators may consume some extra options desiged for some specific cases);
-4. Fast (even if `from` instead of `of` was used here (a character array instead of the whole string), this method will work as fast as is).
+3. Flexible (operators may consume some extra options desiged for some specific cases);
+4. Fast (even if `from` instead of `of` was used here (a character array instead of the whole string), this method will work as fast as is, and way more faster than calling `await` on each `read` call with Streams API).
 5. Simple (subjectively; easy to read, easy to debug, easy to understand what is happening)

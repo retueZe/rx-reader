@@ -1,6 +1,6 @@
 /** @since v1.0.0 */
 export const EndOfStreamError: EndOfStreamErrorConstructor = class EndOfStreamError extends Error {
-    static readonly DEFAULT_MESSAGE = 'End of stream has been reached.'
+    static readonly DEFAULT_MESSAGE = 'The end of stream has been reached.'
 
     constructor(message?: string | null, options?: ErrorOptions | null) {
         super(message ?? EndOfStreamError.DEFAULT_MESSAGE, options ?? undefined)

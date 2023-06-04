@@ -46,7 +46,7 @@
   },
   "scripts": {
     "lint": "eslint .",
-    "build:prod": "rollup -c",
+    "build:prod": "npm run lint && rollup -c",
     "build:dev": "tsc --outDir dist --inlineSourceMap --module commonjs",
     "clean": "rm -rf dist operators utils",
     "prepare": "npm run clean && npm run build:prod",
@@ -67,6 +67,6 @@
     "rxjs": "^7.0.0"
   },
   "dependencies": {
-    "async-option": "^2.4.0"
+    "async-option": "^2.5.0"
   }
 }
