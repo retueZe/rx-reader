@@ -1,4 +1,4 @@
-import { Failure, Success } from 'async-option'
+import { Failure } from 'async-option'
 import { ChunkTypeId, ChunkTypeMap, SimpleOperatorIterator } from '../abstraction'
 import { areChunksEqual } from '../utils/chunk'
 import { peek } from './peek'

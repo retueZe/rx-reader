@@ -1,4 +1,4 @@
-import type { Option, Result } from 'async-option'
+import type { Option } from 'async-option'
 import type { AsyncResult } from 'async-option/async'
 import type { Observable, Unsubscribable } from 'rxjs'
 
