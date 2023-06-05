@@ -85,7 +85,11 @@ const config = [
         ],
         plugins: [
             typescript(),
-            terser({ecma: 2020})
+            terser({
+                ecma: 2020,
+                keep_classnames: true,
+                keep_fnames: true
+            })
         ]
     },
     {
