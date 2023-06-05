@@ -85,7 +85,7 @@ export class Reader<C extends ChunkTypeId = 'text'> implements IReader<C> {
     private _interpretComplexOperator(
         iterator: SimpleOperatorIterator<unknown, unknown, C>,
         resolve: (result: Result<unknown>) => void,
-        reject: (error: Error) => void,
+        reject: (error: unknown) => void,
         contexts?: ContextCollection | null,
         chunk?: Result<ChunkTypeMap[C], Error> | null,
     ): void {
@@ -108,7 +108,9 @@ export class Reader<C extends ChunkTypeId = 'text'> implements IReader<C> {
                         ? error
                         : new Failure((error as FailureLike).error))
 
-                throw error
+                reject(error)
+
+                return
             }
 
             const {value, done} = iteratorResult
