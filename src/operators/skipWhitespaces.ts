@@ -3,7 +3,7 @@ import { isWhitespace } from '../utils'
 import { skipWhile } from './skipWhile'
 
 /**
- * `skipWhile(c => /\s/.test(c))`
+ * `skipWhile(isWhitespace)`
  * @since v1.0.0
  */
 export function skipWhitespaces(limit?: number | null): SimpleOperator<'text', 'skipWhile'> {

@@ -65,3 +65,10 @@ export function areChunksEqual<C extends ChunkTypeId>(left: ChunkTypeMap[C], rig
 export function isWhitespace(char: string): boolean {
     return SPACE_PATTERN.test(char)
 }
+/**
+ * @see {@link isWhitespace}
+ * @since v1.0.0
+ */
+export function notWhitespace(char: string): boolean {
+    return !isWhitespace(char)
+}
