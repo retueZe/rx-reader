@@ -7,6 +7,8 @@ export type ChunkTypeIdFromChunkType<C> = C extends string
         ? 'binary'
         : never
 
+const SPACE_PATTERN = /\s/
+
 /** @since v1.0.0 */
 export function subviewChunk<C extends ChunkTypeId>(
     chunk: ChunkTypeMap[C],
@@ -55,4 +57,11 @@ export function areChunksEqual<C extends ChunkTypeId>(left: ChunkTypeMap[C], rig
         ? left === right
         : Math.abs(left.length - right.length) < 0.5 &&
             left.every((byte, i) => Math.abs(byte - right[i]) < 0.5)
+}
+/**
+ * `/\s/.test(char)`
+ * @since v1.0.0
+ */
+export function isWhitespace(char: string): boolean {
+    return SPACE_PATTERN.test(char)
 }
