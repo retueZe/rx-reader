@@ -23,7 +23,7 @@ Since our I/O is based on interrupting (pushing), the best solution was to use t
 ```javascript
 import { IoBuffer } from 'rx-reader'
 import { demand, peek, readWhile, skipWhitespaces } from 'rx-reader/operators'
-import { Failure, Success } from 'async-option'
+import { Failure } from 'async-option'
 import { of } from 'rxjs'
 
 const NAME_PATTERN = /[a-z-]+/i
@@ -31,30 +31,23 @@ const NAME_PATTERN = /[a-z-]+/i
 // funciton parsing HTTP message header lines
 // returns `either`-like value
 function* lineParser() {
-    let result
-
     // simple operators returns read data, `skipXxx` methods returns empty chunks
     yield skipWhitespaces()
     // reads data while condition is true
     // has some options like `limit` and `inclusive` (limitless and non-inclusive by default)
     const name = yield readWhile(c => c !== ' ' && c !== ':')
 
-    if (!NAME_PATTERN.test(name)) return new Failure('bad-name-format')
+    if (!NAME_PATTERN.test(name)) throw new Failure('bad-name-format')
 
     yield skipWhitespaces()
     // calling built-in complex operator
     // reads desired amout of data, also demands it to be the passed value
-    result = yield* demand(':', () => 'semicolon-expected')
-
-    if (!result.isSucceeded) return result
-
+    yield* demand(':', () => 'semicolon-expected')
     yield skipWhitespaces()
     const value = yield readWhile(c => c !== '\r')
-    result = yield* demand('\r\n', () => 'new-line-expected')
+    yield* demand('\r\n', () => 'new-line-expected')
 
-    if (!result.isSucceeded) return result
-
-    return new Success({name, value})
+    return {name, value}
 }
 
 // you may enter your input here to see the reaction
