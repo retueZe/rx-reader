@@ -63,10 +63,8 @@
     "rollup-plugin-dts": "^5.3.0",
     "typescript": "^5.0.4"
   },
-  "peerDependencies": {
-    "rxjs": "^7.0.0"
-  },
   "dependencies": {
-    "async-option": "^2.5.0"
+    "async-option": "^2.5.0",
+    "rxjs": "^7.0.0"
   }
 }
