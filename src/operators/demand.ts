@@ -26,8 +26,8 @@ export function* demand<C extends ChunkTypeId = 'text', E = unknown>(
     const inclusive = options?.inclusive ?? true
     const actual = yield peek(expected.length, {strict: false})
 
-    if (!areChunksEqual(expected, actual)) return new Failure(errorFactory(actual))
+    if (!areChunksEqual(expected, actual)) throw new Failure(errorFactory(actual))
     if (inclusive) yield skip(actual.length)
 
-    return new Success(actual)
+    return actual
 }

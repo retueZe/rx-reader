@@ -19,7 +19,9 @@ export function* call<T, E = unknown, C extends ChunkTypeId = 'text'>(
     yield wait(continuation)
 
     if (result === null) throw new Error('STUB')
-    if (throwOnReject && result.isSucceeded) throw result.error
+    if (!result.isSucceeded) throw throwOnReject
+        ? result.error
+        : result
 
-    return result
+    return result.value
 }

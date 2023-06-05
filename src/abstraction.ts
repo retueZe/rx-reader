@@ -81,8 +81,9 @@ export type SimpleOperator<C extends ChunkTypeId = 'text', I extends SimpleOpera
 /** @since v1.0.0 */
 export type ComplexOperator<O, E = unknown, C extends ChunkTypeId = 'text'> = () => SimpleOperatorIterator<O, E, C>
 /** @since v1.0.0 */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export type SimpleOperatorIterator<O, E = unknown, C extends ChunkTypeId = 'text'> =
-    Generator<Readonly<SimpleOperator<C>>, Result<O, E>, ChunkTypeMap[C]>
+    Generator<Readonly<SimpleOperator<C>>, O, ChunkTypeMap[C]>
 
 /** @since v1.0.0 */
 export interface IReader<C extends ChunkTypeId = 'text'> extends Unsubscribable {

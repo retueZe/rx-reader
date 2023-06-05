@@ -1,4 +1,4 @@
-import type { Result } from 'async-option'
+import { Failure, FailureLike, Result, Success } from 'async-option'
 import { AsyncResult } from 'async-option/async'
 import { Observable, Subject, Unsubscribable } from 'rxjs'
 import type { IIoBuffer } from '../IoBuffer'
@@ -96,11 +96,24 @@ export class Reader<C extends ChunkTypeId = 'text'> implements IReader<C> {
             if (typeof chunk !== 'undefined' && chunk !== null && !chunk.isSucceeded)
                 return reject(chunk.error)
 
-            const {value, done} = typeof chunk === 'undefined' || chunk === null
-                ? iterator.next()
-                : iterator.next(chunk.value)
+            let iteratorResult: IteratorResult<SimpleOperator<C>, unknown>
 
-            if (done ?? false) return resolve(value as Result<unknown>)
+            try {
+                iteratorResult = typeof chunk === 'undefined' || chunk === null
+                    ? iterator.next()
+                    : iterator.next(chunk.value)
+            } catch (error) {
+                if (typeof error === 'object' && error !== null && 'isSucceeded' in error)
+                    return resolve(error instanceof Failure
+                        ? error
+                        : new Failure((error as FailureLike).error))
+
+                throw error
+            }
+
+            const {value, done} = iteratorResult
+
+            if (done ?? false) return resolve(new Success(value))
 
             const operator = value
             const interpreterResult = this._interpretSimpleOperator(operator, boundInterpreter, contexts)

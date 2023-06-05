@@ -10,5 +10,5 @@ export function* popContext<T, C extends ChunkTypeId = 'text'>(
     // TODO: wtf?
     yield {id: 'getContext', args: {constructor, mutable: false, retain: false, target}} as any
 
-    return target.context.toResult(() => {throw new Error('STUB')})
+    return target.context.get(() => new Error('STUB'))
 }
