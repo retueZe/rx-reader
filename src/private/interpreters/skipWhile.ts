@@ -1,7 +1,7 @@
 import { Failure, Result, Success } from 'async-option'
 import { Unsubscribable } from 'rxjs'
 import { ChunkTypeId, ChunkItemTypeMap, ChunkTypeMap, EndOfStreamError, IIoBuffer, IReader, SimpleOperatorArgsTypeMap } from '../..'
-import { getChunkItem, getEmptyChunk } from '../../utils'
+import { createHollowChunk, getChunkItem } from '../../utils'
 import { ContextCollection } from '../ContextCollection'
 import { GenericInterpreter, InterpreterCallback } from '../interpreter'
 
@@ -19,13 +19,14 @@ export const skipWhile: GenericInterpreter<'skipWhile'> = <C extends ChunkTypeId
 
     if (limit !== null && limit < -0.5) throw new RangeError('Limit cannot be negative.')
 
-    return body(condition, limit, inclusive, strict, reader, buffer, callback)
+    return body(condition, limit, inclusive, strict, 0, reader, buffer, callback)
 }
 function body<C extends ChunkTypeId = 'text'>(
     condition: (item: ChunkItemTypeMap[C]) => boolean,
     limit: number | null,
     inclusive: boolean,
     strict: boolean,
+    skipped: number,
     reader: IReader<C>,
     buffer: IIoBuffer<C>,
     callback: InterpreterCallback<C>
@@ -36,18 +37,18 @@ function body<C extends ChunkTypeId = 'text'>(
         if (!chunkOption.hasValue) {
             if (reader.isCompleted) return strict
                 ? new Failure(new EndOfStreamError())
-                : new Success(getEmptyChunk(buffer.chunkTypeId))
+                : new Success(createHollowChunk<C>(skipped))
 
             const onCompleted = () => callback(strict
                 ? new Failure(new EndOfStreamError())
-                : new Success(getEmptyChunk(buffer.chunkTypeId)))
+                : new Success(createHollowChunk<C>(skipped)))
             let subscription: Unsubscribable | null = null
             subscription = reader.onPush.subscribe({
                 next: () => {
                     if (buffer.isEmpty) return
                     if (subscription !== null) subscription.unsubscribe()
 
-                    const chunk = body(condition, limit, inclusive, strict, reader, buffer, callback)
+                    const chunk = body(condition, limit, inclusive, strict, skipped, reader, buffer, callback)
 
                     if (chunk !== null) callback(chunk)
                 },
@@ -70,18 +71,19 @@ function body<C extends ChunkTypeId = 'text'>(
 
             if (!condition(item)) {
                 const offset = inclusive ? i + 1 : i
-                buffer.skip(offset)
+                skipped += buffer.skip(offset)
 
-                return new Success(getEmptyChunk(buffer.chunkTypeId))
+                return new Success(createHollowChunk<C>(skipped))
             }
         }
 
         if (limit !== null && limit < 0.5) {
-            buffer.skip(maxRead)
+            skipped += buffer.skip(maxRead)
 
-            return new Success(getEmptyChunk(buffer.chunkTypeId))
+            return new Success(createHollowChunk<C>(skipped))
         }
 
+        skipped += chunk.length
         buffer.shift()
     }
 }

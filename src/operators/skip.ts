@@ -1,4 +1,4 @@
-import type { ChunkTypeId, SimpleOperator } from '../abstraction'
+import type { ChunkTypeId, SimpleOperator, SimpleOperatorIterator } from '../abstraction'
 
 /** @since v1.0.0 */
 export type SkipOptions = {
@@ -11,15 +11,17 @@ export type SkipOptions = {
 }
 
 /** @since v1.0.0 */
-export function skip<C extends ChunkTypeId = 'text'>(
+export function* skip<C extends ChunkTypeId = 'text'>(
     count?: number | null,
     options?: Readonly<SkipOptions> | null
-): SimpleOperator<C, 'skip'> {
-    return {
+): SimpleOperatorIterator<number, unknown, C> {
+    const skipped = yield {
         id: 'skip',
         args: {
             count: count ?? null,
             strict: options?.strict ?? true
         }
-    }
+    } as SimpleOperator<C, 'skip'>
+
+    return skipped.length
 }

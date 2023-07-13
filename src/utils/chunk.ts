@@ -68,3 +68,7 @@ export function isWhitespace(char: string): boolean {
 export function notWhitespace(char: string): boolean {
     return !isWhitespace(char)
 }
+/** @since v1.0.0 */
+export function createHollowChunk<C extends ChunkTypeId>(length: number): ChunkTypeMap[C] {
+    return {length} as ChunkTypeMap[C]
+}

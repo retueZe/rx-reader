@@ -31,19 +31,21 @@ const NAME_PATTERN = /[a-z-]+/i
 // funciton parsing HTTP message header lines
 // returns `either`-like value
 function* lineParser() {
-    // simple operators returns read data, `skipXxx` methods returns empty chunks
-    yield skipWhitespaces()
+    // calling built-in complex operator, which can return data of any type
+    // here, it skips spaces until a non-space character comes up and returns
+    // the number of skipped spaces
+    yield* skipWhitespaces()
+    // simple operators returns read data (`string` or `Uint8Array`)
     // reads data while condition is true
-    // has some options like `limit` and `inclusive` (limitless and non-inclusive by default)
+    // has some options like `limit` and `inclusive` (limitless and non-
+    // inclusive by default)
     const name = yield readWhile(c => c !== ' ' && c !== ':')
 
     if (!NAME_PATTERN.test(name)) throw new Failure('bad-name-format')
 
-    yield skipWhitespaces()
-    // calling built-in complex operator
-    // reads desired amout of data, also demands it to be the passed value
+    yield* skipWhitespaces()
     yield* demand(':', () => 'semicolon-expected')
-    yield skipWhitespaces()
+    yield* skipWhitespaces()
     const value = yield readWhile(c => c !== '\r')
     yield* demand('\r\n', () => 'new-line-expected')
 
@@ -60,7 +62,8 @@ reader.read(lineParser)
     .onFailure(error => console.log(`Error has been occurred: ${error}`))
 // consumes stuff from observable, doesnt react on its completing
 buffer.consume(of(INPUT))
-// passing `undefined` or `null` to `peek` will cause it to read all the data until the buffer is marked as completed
+// passing `undefined` or `null` to `peek` will cause it to read all the data
+// until the buffer is marked as completed
 reader.read(peek()).then(console.log)
 buffer.complete()
 

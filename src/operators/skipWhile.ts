@@ -1,4 +1,4 @@
-import type { ChunkTypeId, ChunkItemTypeMap, SimpleOperator } from '..'
+import type { ChunkTypeId, ChunkItemTypeMap, SimpleOperator, SimpleOperatorIterator } from '..'
 
 /** @since v1.0.0 */
 export type SkipWhileOptions = {
@@ -23,11 +23,11 @@ export type SkipWhileOptions = {
 }
 
 /** @since v1.0.0 */
-export function skipWhile<C extends ChunkTypeId = 'text'>(
+export function* skipWhile<C extends ChunkTypeId = 'text'>(
     condition: (item: ChunkItemTypeMap[C]) => boolean,
     options?: Readonly<SkipWhileOptions> | null
-): SimpleOperator<C, 'skipWhile'> {
-    return {
+): SimpleOperatorIterator<number, unknown, C> {
+    const skipped = yield {
         id: 'skipWhile',
         args: {
             condition,
@@ -36,4 +36,6 @@ export function skipWhile<C extends ChunkTypeId = 'text'>(
             strict: options?.strict ?? true
         }
     } as SimpleOperator<C, 'skipWhile'>
+
+    return skipped.length
 }
