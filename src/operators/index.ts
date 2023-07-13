@@ -1,5 +1,6 @@
 export * from './read'
 export * from './readWhile'
+export * from './readLine'
 export * from './peek'
 export * from './peekWhile'
 export * from './skip'
