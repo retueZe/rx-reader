@@ -24,21 +24,27 @@ export type SimpleGenericOperatorArgsTypeMap = {
 /** @since v1.0.0 */
 export type SimpleTextOperatorArgsTypeMap = SimpleGenericOperatorArgsTypeMap & {
     /** @since v1.0.0 */
-    readWhile: Readonly<{condition: (char: string) => boolean, limit: number | null, inclusive: boolean}>
+    readWhile: XxxWhileArg
     /** @since v1.0.0 */
-    peekWhile: Readonly<{condition: (char: string) => boolean, limit: number | null, inclusive: boolean}>
+    peekWhile: XxxWhileArg
     /** @since v1.0.0 */
-    skipWhile: Readonly<{condition: (char: string) => boolean, limit: number | null, inclusive: boolean}>
+    skipWhile: XxxWhileArg
 }
 /** @since v1.0.0 */
 export type SimpleBinaryOperatorArgsTypeMap = SimpleGenericOperatorArgsTypeMap & {
     /** @since v1.0.0 */
-    readWhile: Readonly<{condition: (byte: number) => boolean, limit: number | null, inclusive: boolean}>
+    readWhile: XxxWhileArg<'binary'>
     /** @since v1.0.0 */
-    peekWhile: Readonly<{condition: (byte: number) => boolean, limit: number | null, inclusive: boolean}>
+    peekWhile: XxxWhileArg<'binary'>
     /** @since v1.0.0 */
-    skipWhile: Readonly<{condition: (byte: number) => boolean, limit: number | null, inclusive: boolean}>
+    skipWhile: XxxWhileArg<'binary'>
 }
+type XxxWhileArg<C extends ChunkTypeId = 'text'> = Readonly<{
+    condition: (char: ChunkTypeMap[C]) => boolean,
+    limit: number | null,
+    inclusive: boolean,
+    strict: boolean
+}>
 
 type ChunkTypeInfoMap = {
     'text': [string, string, SimpleTextOperatorArgsTypeMap],

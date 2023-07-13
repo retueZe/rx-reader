@@ -15,16 +15,18 @@ export const readWhile: GenericInterpreter<'readWhile'> = <C extends ChunkTypeId
     const condition = args.condition as (item: ChunkItemTypeMap[C]) => boolean
     const limit = args.limit === null ? null : Math.floor(args.limit)
     const inclusive = args.inclusive
+    const strict = args.strict
     const chunks: ChunkTypeMap[C][] = []
 
     if (limit !== null && limit < -0.5) throw new RangeError('Limit cannot be negative.')
 
-    return body(condition, limit, inclusive, chunks, reader, buffer, callback)
+    return body(condition, limit, inclusive, strict, chunks, reader, buffer, callback)
 }
 function body<C extends ChunkTypeId = 'text'>(
     condition: (item: ChunkItemTypeMap[C]) => boolean,
     limit: number | null,
     inclusive: boolean,
+    strict: boolean,
     chunks: ChunkTypeMap[C][],
     reader: IReader<C>,
     buffer: IIoBuffer<C>,
@@ -34,16 +36,25 @@ function body<C extends ChunkTypeId = 'text'>(
         const chunkOption = buffer.first()
 
         if (!chunkOption.hasValue) {
-            if (reader.isCompleted) return new Failure(new EndOfStreamError())
+            if (reader.isCompleted) return strict
+                ? new Failure(new EndOfStreamError())
+                : new Success(joinChunks(buffer.chunkTypeId, chunks))
 
+            const onCompleted = () => callback(strict
+                ? new Failure(new EndOfStreamError())
+                : new Success(joinChunks(buffer.chunkTypeId, chunks)))
             let subscription: Unsubscribable | null = null
-            subscription = reader.onPush.subscribe(() => {
-                if (buffer.isEmpty) return
-                if (subscription !== null) subscription.unsubscribe()
+            subscription = reader.onPush.subscribe({
+                next: () => {
+                    if (buffer.isEmpty) return
+                    if (subscription !== null) subscription.unsubscribe()
 
-                const chunk = body(condition, limit, inclusive, chunks, reader, buffer, callback)
+                    const chunk = body(condition, limit, inclusive, strict, chunks, reader, buffer, callback)
 
-                if (chunk !== null) callback(chunk)
+                    if (chunk !== null) callback(chunk)
+                },
+                error: onCompleted,
+                complete: onCompleted
             })
 
             return null
@@ -64,7 +75,7 @@ function body<C extends ChunkTypeId = 'text'>(
                 const chunkSubview = buffer.read(offset)
                 chunks.push(chunkSubview)
 
-                return new Success(joinChunks(chunks[0], ...chunks.slice(1)))
+                return new Success(joinChunks(buffer.chunkTypeId, chunks))
             }
         }
 
@@ -72,7 +83,7 @@ function body<C extends ChunkTypeId = 'text'>(
             const chunkSubview = buffer.read(maxRead)
             chunks.push(chunkSubview)
 
-            return new Success(joinChunks(chunks[0], ...chunks.slice(1)))
+            return new Success(joinChunks(buffer.chunkTypeId, chunks))
         }
 
         chunks.push(chunk)

@@ -15,15 +15,17 @@ export const skipWhile: GenericInterpreter<'skipWhile'> = <C extends ChunkTypeId
     const condition = args.condition as (item: ChunkItemTypeMap[C]) => boolean
     const limit = args.limit === null ? null : Math.floor(args.limit)
     const inclusive = args.inclusive
+    const strict = args.strict
 
     if (limit !== null && limit < -0.5) throw new RangeError('Limit cannot be negative.')
 
-    return body(condition, limit, inclusive, reader, buffer, callback)
+    return body(condition, limit, inclusive, strict, reader, buffer, callback)
 }
 function body<C extends ChunkTypeId = 'text'>(
     condition: (item: ChunkItemTypeMap[C]) => boolean,
     limit: number | null,
     inclusive: boolean,
+    strict: boolean,
     reader: IReader<C>,
     buffer: IIoBuffer<C>,
     callback: InterpreterCallback<C>
@@ -32,14 +34,16 @@ function body<C extends ChunkTypeId = 'text'>(
         const chunkOption = buffer.first()
 
         if (!chunkOption.hasValue) {
-            if (reader.isCompleted) return new Failure(new EndOfStreamError())
+            if (reader.isCompleted) return strict
+                ? new Failure(new EndOfStreamError())
+                : new Success(getEmptyChunk(buffer.chunkTypeId))
 
             let subscription: Unsubscribable | null = null
             subscription = reader.onPush.subscribe(() => {
                 if (buffer.isEmpty) return
                 if (subscription !== null) subscription.unsubscribe()
 
-                const chunk = body(condition, limit, inclusive, reader, buffer, callback)
+                const chunk = body(condition, limit, inclusive, strict, reader, buffer, callback)
 
                 if (chunk !== null) callback(chunk)
             })
