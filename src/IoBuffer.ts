@@ -53,11 +53,13 @@ export interface IIoBuffer<C extends ChunkTypeId = 'text'> extends Observer<Chun
      * @since v1.0.0
      */
     require(count: number, callback: (available: number) => void): void
-    /** Forwards the input of `next` and `error` method to the `target`
+    /**
+     * Forwards the input of `next` and `error` method to the `target`
      * @since v1.0.0
      */
     pipe(target: Observer<ChunkTypeMap[C]>): Unsubscribable
-    /** Consumes chunks from the `source`, ignoring the fact of its completion.
+    /**
+     * Consumes chunks from the `source`, ignoring the fact of its completion.
      * @since v1.0.0
      */
     consume(source: Subscribable<ChunkTypeMap[C]>): Unsubscribable

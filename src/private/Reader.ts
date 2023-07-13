@@ -30,6 +30,14 @@ export class Reader<C extends ChunkTypeId = 'text'> implements IReader<C> {
         })
     }
 
+    private static _makeInterpreterCallback<C extends ChunkTypeId = 'text'>(
+        resolve: (chunk: ChunkTypeMap[C]) => void,
+        reject: (error: Error) => void
+    ): InterpreterCallback<C> {
+        return chunk => chunk.isSucceeded
+            ? resolve(chunk.value)
+            : reject(chunk.error)
+    }
     private _error(error: Error): void {
         if (this.isCompleted) return
         if (this._bufferSubscription !== null) this._bufferSubscription.unsubscribe()
@@ -63,14 +71,6 @@ export class Reader<C extends ChunkTypeId = 'text'> implements IReader<C> {
 
                 if (result !== null) return callback(result)
             })
-    }
-    private static _makeInterpreterCallback<C extends ChunkTypeId = 'text'>(
-        resolve: (chunk: ChunkTypeMap[C]) => void,
-        reject: (error: Error) => void
-    ): InterpreterCallback<C> {
-        return chunk => chunk.isSucceeded
-            ? resolve(chunk.value)
-            : reject(chunk.error)
     }
     private _interpretSimpleOperator(
         operator: SimpleOperator<C>,
