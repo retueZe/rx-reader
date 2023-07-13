@@ -38,14 +38,21 @@ function body<C extends ChunkTypeId = 'text'>(
                 ? new Failure(new EndOfStreamError())
                 : new Success(getEmptyChunk(buffer.chunkTypeId))
 
+            const onCompleted = () => callback(strict
+                ? new Failure(new EndOfStreamError())
+                : new Success(getEmptyChunk(buffer.chunkTypeId)))
             let subscription: Unsubscribable | null = null
-            subscription = reader.onPush.subscribe(() => {
-                if (buffer.isEmpty) return
-                if (subscription !== null) subscription.unsubscribe()
+            subscription = reader.onPush.subscribe({
+                next: () => {
+                    if (buffer.isEmpty) return
+                    if (subscription !== null) subscription.unsubscribe()
 
-                const chunk = body(condition, limit, inclusive, strict, reader, buffer, callback)
+                    const chunk = body(condition, limit, inclusive, strict, reader, buffer, callback)
 
-                if (chunk !== null) callback(chunk)
+                    if (chunk !== null) callback(chunk)
+                },
+                error: onCompleted,
+                complete: onCompleted
             })
 
             return null

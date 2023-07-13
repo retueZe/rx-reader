@@ -14,6 +14,12 @@ export type ReadWhileOptions = {
      * @since v1.0.0
      */
     inclusive?: boolean | null
+    /**
+     * If `true`, throws an `EndOfStreamError` error once the stream ends; otherwise, completes reading successfully.
+     * @default true
+     * @since v1.0.0
+     */
+    strict?: boolean | null
 }
 
 /** @since v1.0.0 */
@@ -26,7 +32,8 @@ export function readWhile<C extends ChunkTypeId = 'text'>(
         args: {
             condition,
             limit: options?.limit ?? null,
-            inclusive: options?.inclusive ?? false
+            inclusive: options?.inclusive ?? false,
+            strict: options?.strict ?? true
         }
     } as SimpleOperator<C, 'readWhile'>
 }
