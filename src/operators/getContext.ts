@@ -1,5 +1,5 @@
 import { Failure, NONE, Option } from 'async-option'
-import type { ChunkTypeId, ContextConstructor, SimpleOperatorIterator } from '../abstraction'
+import type { ChunkTypeId, ContextConstructor, SimpleOperatorIterator } from '../index.js'
 
 /** @since v1.0.0 */
 export function* getContext<T, C extends ChunkTypeId = 'text'>(

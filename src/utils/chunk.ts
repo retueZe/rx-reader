@@ -1,4 +1,4 @@
-import type { ChunkItemTypeMap, ChunkTypeId, ChunkTypeMap } from '..'
+import type { ChunkItemTypeMap, ChunkTypeId, ChunkTypeMap } from '../index.js'
 
 /** @since v1.0.0 */
 export type ChunkTypeIdFromChunkType<C> = C extends string

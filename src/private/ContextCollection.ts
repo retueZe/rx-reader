@@ -1,6 +1,6 @@
 import { NONE, Option, Some } from 'async-option'
 import * as OptionUtils from 'async-option/utils/option'
-import { ContextConstructor } from '../abstraction'
+import type { ContextConstructor } from '../index.js'
 
 export class ContextCollection {
     private readonly _mutableContexts = new Map<object, any>()

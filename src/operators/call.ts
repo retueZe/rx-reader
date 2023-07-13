@@ -1,6 +1,6 @@
 import { Failure, Result, Success } from 'async-option'
-import { ChunkTypeId, SimpleOperatorIterator } from '../abstraction'
-import { wait } from './wait'
+import { ChunkTypeId, SimpleOperatorIterator } from '../index.js'
+import { wait } from './wait.js'
 
 export function* call<T, E = unknown, C extends ChunkTypeId = 'text'>(
     promise: Promise<T>

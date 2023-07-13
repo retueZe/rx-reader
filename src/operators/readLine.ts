@@ -1,5 +1,5 @@
-import { ChunkTypeMap, SimpleOperatorIterator } from '../abstraction'
-import { readWhile } from './readWhile'
+import type { ChunkTypeMap, SimpleOperatorIterator } from '../index.js'
+import { readWhile } from './readWhile.js'
 
 /** @since v1.0.0 */
 export type ReadLineOptions = {

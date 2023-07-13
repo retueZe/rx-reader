@@ -1,4 +1,4 @@
-import { ChunkTypeId, SimpleOperator, SimpleOperatorIterator } from '../abstraction'
+import { ChunkTypeId, SimpleOperator, SimpleOperatorIterator } from '../index.js'
 
 export function* isCompleted<C extends ChunkTypeId = 'text'>(): SimpleOperatorIterator<boolean, never, C> {
     const chunk = yield {

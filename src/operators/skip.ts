@@ -1,4 +1,4 @@
-import type { ChunkTypeId, SimpleOperator, SimpleOperatorIterator } from '../abstraction'
+import type { ChunkTypeId, SimpleOperator, SimpleOperatorIterator } from '../index.js'
 
 /** @since v1.0.0 */
 export type SkipOptions = {

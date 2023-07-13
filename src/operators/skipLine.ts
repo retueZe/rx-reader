@@ -1,5 +1,5 @@
-import { SimpleOperatorIterator } from '../abstraction'
-import { skipWhile } from './skipWhile'
+import { SimpleOperatorIterator } from '../index.js'
+import { skipWhile } from './skipWhile.js'
 
 /** @since v1.0.0 */
 export type SkipLineOptions = {

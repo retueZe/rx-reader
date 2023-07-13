@@ -1,9 +1,9 @@
 import { NONE, Option, Some } from 'async-option'
 import { Observable, Observer, Subject, Subscribable, Unsubscribable } from 'rxjs'
-import type { ChunkTypeId, ChunkTypeMap, IReader } from './abstraction'
-import { Reader } from './private/Reader'
-import { SubviewIoBuffer } from './private/SubviewIoBuffer'
-import { getEmptyChunk, joinChunks, subviewChunk } from './utils'
+import type { ChunkTypeId, ChunkTypeMap, IReader } from './abstraction.js'
+import { Reader } from './private/Reader.js'
+import { SubviewIoBuffer } from './private/SubviewIoBuffer.js'
+import { getEmptyChunk, joinChunks, subviewChunk } from './utils/index.js'
 
 /** @since v1.0.0 */
 export interface IIoBuffer<C extends ChunkTypeId = 'text'> extends Observer<ChunkTypeMap[C]> {

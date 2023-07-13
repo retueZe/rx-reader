@@ -1,5 +1,5 @@
-import { ChunkTypeMap, SimpleOperatorIterator } from '../abstraction'
-import { peekWhile } from './peekWhile'
+import { ChunkTypeMap, SimpleOperatorIterator } from '../index.js'
+import { peekWhile } from './peekWhile.js'
 
 /** @since v1.0.0 */
 export type PeekLineOptions = {

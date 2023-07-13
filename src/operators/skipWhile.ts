@@ -1,4 +1,4 @@
-import type { ChunkTypeId, ChunkItemTypeMap, SimpleOperator, SimpleOperatorIterator } from '..'
+import type { ChunkTypeId, ChunkItemTypeMap, SimpleOperator, SimpleOperatorIterator } from '../index.js'
 
 /** @since v1.0.0 */
 export type SkipWhileOptions = {

@@ -1,7 +1,7 @@
 import type { Result } from 'async-option'
-import type { ChunkTypeId, ChunkTypeMap, GenericOperatorId, IIoBuffer, IReader, SimpleOperatorArgsTypeMap, SimpleOperatorId } from '..'
-import { ContextCollection } from './ContextCollection'
-import { read, readWhile, peek, peekWhile, skip, skipWhile, wait, pushContext, setContext, unsetContext, getContext, isCompleted } from './interpreters'
+import type { ChunkTypeId, ChunkTypeMap, GenericOperatorId, IIoBuffer, IReader, SimpleOperatorArgsTypeMap, SimpleOperatorId } from '../index.js'
+import { ContextCollection } from './ContextCollection.js'
+import { read, readWhile, peek, peekWhile, skip, skipWhile, wait, pushContext, setContext, unsetContext, getContext, isCompleted } from './interpreters/index.js'
 
 export type InterpreterCallback<C extends ChunkTypeId = 'text'> = (chunk: Result<ChunkTypeMap[C], Error>) => void
 export type Interpreter<C extends ChunkTypeId = 'text', I extends SimpleOperatorId[C] = SimpleOperatorId[C]> = (

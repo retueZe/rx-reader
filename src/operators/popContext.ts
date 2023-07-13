@@ -1,5 +1,5 @@
 import { NONE, Option } from 'async-option'
-import type { ChunkTypeId, ContextConstructor, SimpleOperatorIterator } from '../abstraction'
+import type { ChunkTypeId, ContextConstructor, SimpleOperatorIterator } from '../index.js'
 
 /** @since v1.0.0 */
 export function* popContext<T, C extends ChunkTypeId = 'text'>(

@@ -1,3 +1,3 @@
-export * from './abstraction'
-export * from './EndOfStreamError'
-export * from './IoBuffer'
+export * from './abstraction.js'
+export * from './EndOfStreamError.js'
+export * from './IoBuffer.js'

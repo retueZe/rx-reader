@@ -1,9 +1,9 @@
 import { Failure, Result, Success } from 'async-option'
 import type { Unsubscribable } from 'rxjs'
-import { ChunkTypeId, ChunkItemTypeMap, ChunkTypeMap, EndOfStreamError, IIoBuffer, IReader, SimpleOperatorArgsTypeMap } from '../..'
-import { getChunkItem, joinChunks } from '../../utils'
-import { ContextCollection } from '../ContextCollection'
-import type { GenericInterpreter, InterpreterCallback } from '../interpreter'
+import { ChunkTypeId, ChunkItemTypeMap, ChunkTypeMap, EndOfStreamError, IIoBuffer, IReader, SimpleOperatorArgsTypeMap } from '../../index.js'
+import { getChunkItem, joinChunks } from '../../utils/index.js'
+import type { ContextCollection } from '../ContextCollection.js'
+import type { GenericInterpreter, InterpreterCallback } from '../interpreter.js'
 
 export const readWhile: GenericInterpreter<'readWhile'> = <C extends ChunkTypeId = 'text'>(
     args: SimpleOperatorArgsTypeMap[C]['readWhile'],

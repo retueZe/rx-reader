@@ -1,10 +1,9 @@
 import { Failure, FailureLike, Result, Success } from 'async-option'
 import { AsyncResult } from 'async-option/async'
 import { Observable, Subject, Unsubscribable } from 'rxjs'
-import type { IIoBuffer } from '../IoBuffer'
-import type { ChunkTypeId, ChunkTypeMap, SimpleOperator, ComplexOperator, SimpleOperatorIterator, IReader } from '../abstraction'
-import { InterpreterCallback, INTERPRETERS } from '../private/interpreter'
-import { ContextCollection } from './ContextCollection'
+import type { ChunkTypeId, ChunkTypeMap, SimpleOperator, ComplexOperator, SimpleOperatorIterator, IIoBuffer, IReader } from '../index.js'
+import { InterpreterCallback, INTERPRETERS } from '../private/interpreter.js'
+import { ContextCollection } from './ContextCollection.js'
 
 export class Reader<C extends ChunkTypeId = 'text'> implements IReader<C> {
     private readonly _onPushSubject: Subject<void> = new Subject()

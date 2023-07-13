@@ -1,8 +1,8 @@
 import type { Option } from 'async-option'
 import type { Observable, Observer, Subscribable, Unsubscribable } from 'rxjs'
-import type { IIoBuffer, ChunkTypeId, ChunkTypeMap, IReader } from '..'
-import { joinChunks } from '../utils/chunk'
-import { Reader } from './Reader'
+import type { IIoBuffer, ChunkTypeId, ChunkTypeMap, IReader } from '../index.js'
+import { joinChunks } from '../utils/index.js'
+import { Reader } from './Reader.js'
 
 export type PeekCallback<C extends ChunkTypeId = 'text'> =
     (count: number | null, start: number, output: ChunkTypeMap[C][]) => number

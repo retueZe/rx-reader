@@ -1,6 +1,6 @@
-import type { SimpleOperatorIterator } from '..'
-import { isWhitespace } from '../utils'
-import { skipWhile } from './skipWhile'
+import type { SimpleOperatorIterator } from '../index.js'
+import { isWhitespace } from '../utils/index.js'
+import { skipWhile } from './skipWhile.js'
 
 /**
  * `skipWhile(isWhitespace)`

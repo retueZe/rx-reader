@@ -1,9 +1,8 @@
-import type { ChunkTypeId, ChunkTypeMap, IReader, SimpleOperatorArgsTypeMap } from '../../abstraction'
-import type { IIoBuffer } from '../../IoBuffer'
-import type { GenericInterpreter } from '../interpreter'
+import type { ChunkTypeId, ChunkTypeMap, IIoBuffer, IReader, SimpleOperatorArgsTypeMap } from '../../index.js'
+import type { GenericInterpreter } from '../interpreter.js'
 import { Result, Success } from 'async-option'
-import { getEmptyChunk } from '../../utils'
-import { ContextCollection } from '../ContextCollection'
+import { getEmptyChunk } from '../../utils/index.js'
+import type { ContextCollection } from '../ContextCollection.js'
 
 export const setContext: GenericInterpreter<'setContext'> = <C extends ChunkTypeId = 'text'>(
     args: SimpleOperatorArgsTypeMap[C]['setContext'],

@@ -116,6 +116,7 @@ export interface IReader<C extends ChunkTypeId = 'text'> extends Unsubscribable 
     read<O, E>(operator: ComplexOperator<O, E, C>, contexts?: Iterable<any> | null): AsyncResult<O, E>
 }
 
+/** @since v1.0.0 */
 export interface ContextConstructor<C = any> {
     readonly prototype: C
 }

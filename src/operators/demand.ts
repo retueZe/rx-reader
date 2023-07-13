@@ -1,8 +1,8 @@
 import { Failure } from 'async-option'
-import { ChunkTypeId, ChunkTypeMap, SimpleOperatorIterator } from '../abstraction'
-import { areChunksEqual } from '../utils/chunk'
-import { peek } from './peek'
-import { skip } from './skip'
+import { ChunkTypeId, ChunkTypeMap, SimpleOperatorIterator } from '../index.js'
+import { areChunksEqual } from '../utils/chunk.js'
+import { peek } from './peek.js'
+import { skip } from './skip.js'
 
 /** @since v1.0.0 */
 export type DemandOptions = {
