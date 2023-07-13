@@ -4,7 +4,7 @@
   "version": "1.0.0-rc.1",
   "author": "retueze",
   "license": "MIT",
-  "description": "Fast async streamed I/O library based on RxJS and generators.",
+  "description": "Fast async lossless back-pressure streaming library based on RxJS and generators.",
   "keywords": [
     "async",
     "stream",
@@ -13,7 +13,9 @@
     "io",
     "reader",
     "rxjs",
-    "generator"
+    "generator",
+    "lossless",
+    "backpressure"
   ],
   "repository": {
     "type": "git",

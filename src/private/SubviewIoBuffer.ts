@@ -25,8 +25,8 @@ export class SubviewIoBuffer<C extends ChunkTypeId = 'text'> implements IIoBuffe
     get isCompleted(): boolean {
         return this._source.isCompleted
     }
-    get onPush(): Observable<ChunkTypeMap[C]> {
-        return this._source.onPush
+    get push(): Observable<ChunkTypeMap[C]> {
+        return this._source.push
     }
 
     constructor(
@@ -109,7 +109,7 @@ export class SubviewIoBuffer<C extends ChunkTypeId = 'text'> implements IIoBuffe
 
         if (this.available > count - 0.5) return callback(this.available)
 
-        const subscription = this.onPush.subscribe(() => {
+        const subscription = this.push.subscribe(() => {
             if (this.available < count - 0.5) return
 
             subscription.unsubscribe()
@@ -117,7 +117,7 @@ export class SubviewIoBuffer<C extends ChunkTypeId = 'text'> implements IIoBuffe
         })
     }
     pipe(target: Observer<ChunkTypeMap[C]>): Unsubscribable {
-        return this.onPush.subscribe({
+        return this.push.subscribe({
             next: chunk => target.next(chunk),
             error: error => target.error(error)
         })

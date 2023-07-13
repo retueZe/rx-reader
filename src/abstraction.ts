@@ -105,10 +105,10 @@ export interface IReader<C extends ChunkTypeId = 'text'> extends Unsubscribable 
     /** @since v1.0.0 */
     readonly isBinary: boolean
     /**
-     * Consumes chunks from the owner buffer, returns not the same object as the owner's `onPush` property.
+     * Consumes chunks from the owner buffer, returns not the same object as the owner's `push` property.
      * @since v1.0.0
      */
-    readonly onPush: Observable<void>
+    readonly push: Observable<void>
 
     /** @since v1.0.0 */
     read(operator: SimpleOperator<C>): Promise<ChunkTypeMap[C]>

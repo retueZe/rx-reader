@@ -18,7 +18,7 @@ export interface IIoBuffer<C extends ChunkTypeId = 'text'> extends Observer<Chun
     /** @since v1.0.0 */
     readonly isCompleted: boolean
     /** @since v1.0.0 */
-    readonly onPush: Observable<ChunkTypeMap[C]>
+    readonly push: Observable<ChunkTypeMap[C]>
 
     /** @since v1.0.0 */
     next(chunk: ChunkTypeMap[C]): this
@@ -49,7 +49,7 @@ export interface IIoBuffer<C extends ChunkTypeId = 'text'> extends Observer<Chun
     /** @since v1.0.0 */
     skip(count?: number | null): number
     /**
-     * If the number of available items is greater than or equal to `count`, then calls the `callback` immediately; otherwise subscribes to `onPush` event and waits until the condition passes.
+     * If the number of available items is greater than or equal to `count`, then calls the `callback` immediately; otherwise subscribes to `push` event and waits until the condition passes.
      * @since v1.0.0
      */
     require(count: number, callback: (available: number) => void): void
@@ -66,20 +66,20 @@ export interface IIoBuffer<C extends ChunkTypeId = 'text'> extends Observer<Chun
     /** @since v1.0.0 */
     createReader(): IReader<C>
     /**
-     * Returns a subview of the current buffer. The source buffer may not be affected by the actions of the subview. The `onPush` event is forwarded, the data manipulation methods affect only an internal index property, the read data from the perspective of the subview is peeked data from the perspective of the source.
+     * Returns a subview of the current buffer. The source buffer may not be affected by the actions of the subview. The `push` event is forwarded, the data manipulation methods affect only an internal index property, the read data from the perspective of the subview is peeked data from the perspective of the source.
      * @since v1.0.0
      */
     subview(start?: number | null): IIoBuffer<C>
 }
 /** @since v1.0.0 */
 export class IoBuffer<C extends ChunkTypeId = 'text'> implements IIoBuffer<C> {
-    private readonly _onPushSubject = new Subject<ChunkTypeMap[C]>()
+    private readonly _pushSubject = new Subject<ChunkTypeMap[C]>()
     private _head: ChunkNode<C> | null = null
     private _tail: ChunkNode<C> | null = null
     available = 0
     readonly chunkTypeId: C
     get isCompleted(): boolean {
-        return this._onPushSubject.closed
+        return this._pushSubject.closed
     }
     get isBinary(): boolean {
         return this.chunkTypeId === 'binary'
@@ -87,7 +87,7 @@ export class IoBuffer<C extends ChunkTypeId = 'text'> implements IIoBuffer<C> {
     get isEmpty(): boolean {
         return this.available < 0.5
     }
-    readonly onPush: Observable<ChunkTypeMap[C]> = this._onPushSubject.asObservable()
+    readonly push: Observable<ChunkTypeMap[C]> = this._pushSubject.asObservable()
 
     constructor(chunkTypeId: C) {
         this.chunkTypeId = chunkTypeId
@@ -104,15 +104,15 @@ export class IoBuffer<C extends ChunkTypeId = 'text'> implements IIoBuffer<C> {
         }
 
         this.available += chunk.length
-        this._onPushSubject.next(chunk)
+        this._pushSubject.next(chunk)
 
         return this
     }
     error(error: Error): void {
-        this._onPushSubject.error(error)
+        this._pushSubject.error(error)
     }
     complete(): void {
-        this._onPushSubject.complete()
+        this._pushSubject.complete()
     }
     shift(): Option<ChunkTypeMap[C]> {
         if (this._head === null) return NONE
@@ -291,7 +291,7 @@ export class IoBuffer<C extends ChunkTypeId = 'text'> implements IIoBuffer<C> {
 
         if (this.available > count - 0.5) return callback(this.available)
 
-        const subscription = this.onPush.subscribe(() => {
+        const subscription = this.push.subscribe(() => {
             if (this.available < count - 0.5) return
 
             subscription.unsubscribe()
@@ -299,7 +299,7 @@ export class IoBuffer<C extends ChunkTypeId = 'text'> implements IIoBuffer<C> {
         })
     }
     pipe(target: Observer<ChunkTypeMap[C]>): Unsubscribable {
-        return this.onPush.subscribe({
+        return this.push.subscribe({
             next: chunk => target.next(chunk),
             error: error => target.error(error)
         })

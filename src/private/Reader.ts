@@ -6,7 +6,7 @@ import { InterpreterCallback, INTERPRETERS } from '../private/interpreter.js'
 import { ContextCollection } from './ContextCollection.js'
 
 export class Reader<C extends ChunkTypeId = 'text'> implements IReader<C> {
-    private readonly _onPushSubject: Subject<void> = new Subject()
+    private readonly _pushSubject: Subject<void> = new Subject()
     private readonly _bufferSubscription: Unsubscribable | null = null
     private readonly _buffer: IIoBuffer<C>
     isCompleted = false
@@ -16,12 +16,12 @@ export class Reader<C extends ChunkTypeId = 'text'> implements IReader<C> {
     get isBinary(): boolean {
         return this.chunkTypeId === 'binary'
     }
-    readonly onPush: Observable<void> = this._onPushSubject.asObservable()
+    readonly push: Observable<void> = this._pushSubject.asObservable()
 
     constructor(buffer: IIoBuffer<C>) {
         this._buffer = buffer
-        this._bufferSubscription = this._buffer.onPush.subscribe({
-            next: () => this._onPushSubject.next(),
+        this._bufferSubscription = this._buffer.push.subscribe({
+            next: () => this._pushSubject.next(),
             error: this._error.bind(this),
             complete: this.unsubscribe.bind(this)
         })
@@ -39,7 +39,7 @@ export class Reader<C extends ChunkTypeId = 'text'> implements IReader<C> {
         if (this.isCompleted) return
         if (this._bufferSubscription !== null) this._bufferSubscription.unsubscribe()
 
-        this._onPushSubject.error(error)
+        this._pushSubject.error(error)
     }
     unsubscribe(): void {
         if (this.isCompleted) return
@@ -48,7 +48,7 @@ export class Reader<C extends ChunkTypeId = 'text'> implements IReader<C> {
 
         if (this._bufferSubscription !== null) this._bufferSubscription.unsubscribe()
 
-        this._onPushSubject.complete()
+        this._pushSubject.complete()
     }
     read(operator: SimpleOperator<C>): Promise<ChunkTypeMap[C]>
     read<O, E>(operator: ComplexOperator<O, E, C>, contexts?: Iterable<any> | null): AsyncResult<O, E>

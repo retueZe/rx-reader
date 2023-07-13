@@ -45,7 +45,7 @@ function body<C extends ChunkTypeId = 'text'>(
                 ? new Failure(new EndOfStreamError())
                 : new Success(createHollowChunk<C>(skipped)))
             let subscription: Unsubscribable | null = null
-            subscription = reader.onPush.subscribe({
+            subscription = reader.push.subscribe({
                 next: () => {
                     if (buffer.isEmpty) return
                     if (subscription !== null) subscription.unsubscribe()
