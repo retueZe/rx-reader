@@ -10,9 +10,7 @@ export class Reader<C extends ChunkTypeId = 'text'> implements IReader<C> {
     private readonly _onPushSubject: Subject<void> = new Subject()
     private readonly _bufferSubscription: Unsubscribable | null = null
     private readonly _buffer: IIoBuffer<C>
-    get isCompleted(): boolean {
-        return this._onPushSubject.closed
-    }
+    isCompleted = false
     get chunkTypeId(): C {
         return this._buffer.chunkTypeId
     }
@@ -46,6 +44,9 @@ export class Reader<C extends ChunkTypeId = 'text'> implements IReader<C> {
     }
     unsubscribe(): void {
         if (this.isCompleted) return
+
+        this.isCompleted = true
+
         if (this._bufferSubscription !== null) this._bufferSubscription.unsubscribe()
 
         this._onPushSubject.complete()
