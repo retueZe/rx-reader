@@ -1,6 +1,8 @@
 import { Failure, Result, Success } from 'async-option'
 import type { Unsubscribable } from 'rxjs'
-import { ChunkTypeId, ChunkItemTypeMap, ChunkTypeMap, EndOfStreamError, IIoBuffer, IReader, SimpleOperatorArgsTypeMap } from '../../index.js'
+import type { ChunkTypeId, ChunkItemTypeMap, ChunkTypeMap, IIoBuffer, IReader, SimpleOperatorArgsTypeMap } from '../../index.js'
+// preventing circular dependency
+import { EndOfStreamError } from '../../EndOfStreamError.js'
 import { getChunkItem, joinChunks } from '../../utils/index.js'
 import type { ContextCollection } from '../ContextCollection.js'
 import type { GenericInterpreter, InterpreterCallback } from '../interpreter.js'

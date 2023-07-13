@@ -1,6 +1,8 @@
 import { Failure, Success } from 'async-option'
 import type {  Unsubscribable } from 'rxjs'
-import { ChunkTypeId, ChunkTypeMap, EndOfStreamError, IIoBuffer } from '../../../index.js'
+import type { ChunkTypeId, ChunkTypeMap, IIoBuffer } from '../../../index.js'
+// preventing circular dependency
+import { EndOfStreamError } from '../../../EndOfStreamError.js'
 import type { GenericInterpreter } from '../../interpreter.js'
 
 export type BasicOperatorId = 'read' | 'peek' | 'skip'

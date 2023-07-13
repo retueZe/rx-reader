@@ -9,6 +9,12 @@ const NAMESPACES = [
     'operators',
     'utils'
 ]
+const EXTERNAL = [
+    'rxjs',
+    'async-option',
+    'async-option/async',
+    'async-option/utils/option'
+]
 
 function createEntryFileNames(extension) {
     extension ??= '.js'
@@ -43,7 +49,7 @@ function applyDefaultConfig(config) {
             '',
             ...NAMESPACES
         ]),
-        external: ['async-option', 'rxjs']
+        external: EXTERNAL
     }
 }
 function insertVariable(content, variableName, value) {
@@ -69,20 +75,12 @@ NAMESPACES.forEach(createNamespace)
 /** @type {import('rollup').RollupOptions[]} */
 const config = [
     {
-        output: [
-            {
-                dir: 'dist',
-                entryFileNames: createEntryFileNames('.cjs'),
-                chunkFileNames: '.chunks/[name]-[hash].cjs',
-                format: 'cjs'
-            },
-            {
-                dir: 'dist',
-                entryFileNames: createEntryFileNames('.mjs'),
-                chunkFileNames: '.chunks/[name]-[hash].mjs',
-                format: 'esm'
-            }
-        ],
+        output: {
+            dir: 'dist',
+            entryFileNames: createEntryFileNames(),
+            chunkFileNames: '.chunks/[name]-[hash].js',
+            format: 'esm'
+        },
         plugins: [
             typescript(),
             terser({
