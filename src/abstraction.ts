@@ -20,6 +20,8 @@ export type SimpleGenericOperatorArgsTypeMap = {
     unsetContext: Readonly<{constructor: ContextConstructor}>
     /** @since v1.0.0 */
     getContext: Readonly<{constructor: ContextConstructor, mutable: boolean, retain: boolean, target: {context: Option<any>}}>
+    /** @since v1.0.0 */
+    isCompleted: Readonly<Record<string, never>>
 }
 /** @since v1.0.0 */
 export type SimpleTextOperatorArgsTypeMap = SimpleGenericOperatorArgsTypeMap & {

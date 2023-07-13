@@ -1,7 +1,7 @@
 import type { Result } from 'async-option'
 import type { ChunkTypeId, ChunkTypeMap, GenericOperatorId, IIoBuffer, IReader, SimpleOperatorArgsTypeMap, SimpleOperatorId } from '..'
 import { ContextCollection } from './ContextCollection'
-import { read, readWhile, peek, peekWhile, skip, skipWhile, wait, pushContext, setContext, unsetContext, getContext } from './interpreters'
+import { read, readWhile, peek, peekWhile, skip, skipWhile, wait, pushContext, setContext, unsetContext, getContext, isCompleted } from './interpreters'
 
 export type InterpreterCallback<C extends ChunkTypeId = 'text'> = (chunk: Result<ChunkTypeMap[C], Error>) => void
 export type Interpreter<C extends ChunkTypeId = 'text', I extends SimpleOperatorId[C] = SimpleOperatorId[C]> = (
@@ -24,6 +24,6 @@ export type InterpreterMap = {
     }
 }
 export const INTERPRETERS: Readonly<InterpreterMap> = {
-    'text': {read, readWhile, peek, peekWhile, skip, skipWhile, wait, pushContext, setContext, unsetContext, getContext},
-    'binary': {read, readWhile, peek, peekWhile, skip, skipWhile, wait, pushContext, setContext, unsetContext, getContext}
+    'text': {read, readWhile, peek, peekWhile, skip, skipWhile, wait, pushContext, setContext, unsetContext, getContext, isCompleted},
+    'binary': {read, readWhile, peek, peekWhile, skip, skipWhile, wait, pushContext, setContext, unsetContext, getContext, isCompleted}
 }
