@@ -21,18 +21,14 @@ export function subviewChunk<C extends ChunkTypeId>(
 }
 /** @since v1.0.0 */
 export function joinChunks<C extends ChunkTypeId>(
-    first: ChunkTypeMap[C],
-    ...chunks: ChunkTypeMap[C][]
+    typeId: C,
+    chunks: ChunkTypeMap[C][]
 ): ChunkTypeMap[C] {
-    if (typeof first === 'string') {
-        chunks.unshift(first)
+    if (chunks.length < 0.5) return getEmptyChunk(typeId)
+    if (typeId === 'text') return chunks.join('') as ChunkTypeMap[C]
 
-        return chunks.join('') as ChunkTypeMap[C]
-    }
-
-    const merged = new Uint8Array(first.length + chunks.reduce((sum, chunk) => sum + chunk.length, 0))
-    merged.set(first)
-    let offset = first.length
+    const merged = new Uint8Array(chunks.reduce((sum, chunk) => sum + chunk.length, 0))
+    let offset = 0
 
     for (const chunk of chunks) {
         merged.set(chunk as Uint8Array, offset)

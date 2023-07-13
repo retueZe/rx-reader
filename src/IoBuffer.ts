@@ -176,7 +176,7 @@ export class IoBuffer<C extends ChunkTypeId = 'text'> implements IIoBuffer<C> {
         return returnJoined
             ? output.length < 0.5
                 ? getEmptyChunk(this.chunkTypeId)
-                : joinChunks(output[0], ...output.slice(1))
+                : joinChunks(this.chunkTypeId, output)
             : readed
     }
     private _readAll(output?: ChunkTypeMap[C][]): number | ChunkTypeMap[C] {
@@ -195,7 +195,7 @@ export class IoBuffer<C extends ChunkTypeId = 'text'> implements IIoBuffer<C> {
         return returnJoined
             ? output.length < 0.5
                 ? getEmptyChunk(this.chunkTypeId)
-                : joinChunks(output[0], ...output.slice(1))
+                : joinChunks(this.chunkTypeId, output)
             : readed
     }
     private _clear() {
@@ -233,7 +233,7 @@ export class IoBuffer<C extends ChunkTypeId = 'text'> implements IIoBuffer<C> {
         return returnJoined
             ? output.length < 0.5
                 ? getEmptyChunk(this.chunkTypeId)
-                : joinChunks(output[0], ...output.slice(1))
+                : joinChunks(this.chunkTypeId, output)
             : peeked
     }
     private _peekAll(output?: ChunkTypeMap[C][]): number | ChunkTypeMap[C] {
@@ -250,7 +250,7 @@ export class IoBuffer<C extends ChunkTypeId = 'text'> implements IIoBuffer<C> {
         return returnJoined
             ? output.length < 0.5
                 ? getEmptyChunk(this.chunkTypeId)
-                : joinChunks(output[0], ...output.slice(1))
+                : joinChunks(this.chunkTypeId, output)
             : peeked
     }
     skip(count?: number | null): number {

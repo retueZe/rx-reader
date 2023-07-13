@@ -1,7 +1,7 @@
 import type { Option } from 'async-option'
 import type { Observable, Observer, Subscribable, Unsubscribable } from 'rxjs'
 import type { IIoBuffer, ChunkTypeId, ChunkTypeMap, IReader } from '..'
-import { getEmptyChunk, joinChunks } from '../utils/chunk'
+import { joinChunks } from '../utils/chunk'
 import { Reader } from './Reader'
 
 export type PeekCallback<C extends ChunkTypeId = 'text'> =
@@ -94,7 +94,7 @@ export class SubviewIoBuffer<C extends ChunkTypeId = 'text'> implements IIoBuffe
         const peeked = this._peek(count, this._start, output)
 
         return returnJoined
-            ? joinChunks(getEmptyChunk(this.chunkTypeId), ...output)
+            ? joinChunks(this.chunkTypeId, output)
             : peeked
     }
     skip(count?: number | null): number {
