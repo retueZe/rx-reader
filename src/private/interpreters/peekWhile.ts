@@ -1,7 +1,7 @@
 import { Result } from 'async-option'
-import { ChunkTypeId, ChunkTypeMap, IIoBuffer, IReader, SimpleOperatorArgsTypeMap } from '../..'
+import type { ChunkTypeId, ChunkTypeMap, IIoBuffer, IReader, SimpleOperatorArgsTypeMap } from '../..'
 import { ContextCollection } from '../ContextCollection'
-import { GenericInterpreter, InterpreterCallback } from '../interpreter'
+import type { GenericInterpreter, InterpreterCallback } from '../interpreter'
 import { readWhile } from './readWhile'
 
 export const peekWhile: GenericInterpreter<'peekWhile'> = <C extends ChunkTypeId = 'text'>(

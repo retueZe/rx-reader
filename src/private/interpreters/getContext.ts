@@ -1,6 +1,6 @@
 import type { ChunkTypeId, ChunkTypeMap, IReader, SimpleOperatorArgsTypeMap } from '../../abstraction'
-import { IIoBuffer } from '../../index'
-import { GenericInterpreter } from '../interpreter'
+import type { IIoBuffer } from '../../IoBuffer'
+import type { GenericInterpreter } from '../interpreter'
 import { Result, Some, Success } from 'async-option'
 import { getEmptyChunk } from '../../utils'
 import { ContextCollection } from '../ContextCollection'
