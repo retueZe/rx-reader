@@ -4,7 +4,7 @@ import dts from 'rollup-plugin-dts'
 import * as path from 'node:path'
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 
-const PACKAGE_JSON_IN = readFileSync('shared/package.json.in', {encoding: 'utf-8'})
+const PACKAGE_JSON_IN = readFileSync('share/package.json.in', {encoding: 'utf-8'})
 const NAMESPACES = [
     'operators',
     'utils'
