@@ -4,11 +4,6 @@ import { readWhile } from './readWhile'
 /** @since v1.0.0 */
 export type ReadLineOptions = {
     /**
-     * Determines the maximum number of characters can be returned.
-     * @since v1.0.0
-     */
-    limit?: number | null
-    /**
      * If `true`, retains line termination sequence.
      * @default false
      * @since v1.0.0
@@ -26,7 +21,6 @@ export function* readLine(
     const inclusive = options?.inclusive ?? false
     const predicate = createLineBreakPredicate()
     const line = yield readWhile(predicate, {
-        ...options,
         inclusive: false,
         strict: false
     })
