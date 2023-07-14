@@ -80,3 +80,7 @@ In this code are shown following advantages of this package:
 3. Flexible (operators may consume some extra options desiged for some specific cases);
 4. Fast (even if `from` instead of `of` was used here (a character array instead of the whole string), this method will work as fast as is, and way more faster than calling `await` on each `read` call with Streams API).
 5. Simple (subjectively; easy to read, easy to debug, easy to understand what is happening)
+
+# Documentation
+
+Available [here](https://github.com/retueZe/rx-reader/tree/master/doc).
