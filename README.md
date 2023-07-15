@@ -83,4 +83,4 @@ In this code are shown following advantages of this package:
 
 # Documentation
 
-Available [here](https://github.com/retueZe/rx-reader/tree/master/doc).
+Available [here](/doc/README.md).
