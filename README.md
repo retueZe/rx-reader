@@ -1,6 +1,6 @@
 # `rx-reader`
 
-Fast async streamed I/O library based on RxJS and generators.
+Fast lossless back-pressure streaming library based on RxJS and generators.
 
 ## Why `rx-reader`?
 

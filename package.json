@@ -4,7 +4,7 @@
   "version": "1.0.0-rc.2",
   "author": "retueze",
   "license": "MIT",
-  "description": "Fast async lossless back-pressure streaming library based on RxJS and generators.",
+  "description": "Fast lossless back-pressure streaming library based on RxJS and generators.",
   "keywords": [
     "async",
     "stream",
