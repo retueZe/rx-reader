@@ -1,7 +1,0 @@
-{
-  "name": "<(PKGNAME)/<(NSPATH)",
-  "module": "<(INSTALLDIR)/dist/<(NSPATH).mjs",
-  "main": "<(INSTALLDIR)/dist/<(NSPATH).cjs",
-  "types": "<(INSTALLDIR)/dist/<(NSPATH).d.ts",
-  "sideEffects": false
-}

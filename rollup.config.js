@@ -2,18 +2,17 @@ import typescript from '@rollup/plugin-typescript'
 import terser from '@rollup/plugin-terser'
 import dts from 'rollup-plugin-dts'
 import * as path from 'node:path'
-import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
+import { copyFileSync, existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
 
-const PACKAGE_JSON_IN = readFileSync('share/package.json.in', {encoding: 'utf-8'})
-const NAMESPACES = [
-    'operators',
-    'utils'
-]
 const EXTERNAL = [
     'rxjs',
     'async-option',
     'async-option/async',
     'async-option/utils/option'
+]
+const NAMESPACES = [
+    'operators',
+    'utils'
 ]
 
 function createEntryFileNames(extension) {
@@ -24,8 +23,6 @@ function createEntryFileNames(extension) {
             .relative('./src', chunk.facadeModuleId)
             .replace(/\.[^\\/.]+$/, '')
             .split(/[\\/]/)
-
-        if (pathSegments.length > 1.5) pathSegments.pop()
 
         return pathSegments.join('/') + extension
     }
@@ -45,38 +42,52 @@ function createInput(paths) {
 function applyDefaultConfig(config) {
     return {
         ...config,
-        input: createInput([
-            '',
-            ...NAMESPACES
-        ]),
+        input: createInput(['', ...NAMESPACES]),
         external: EXTERNAL
     }
 }
-function insertVariable(content, variableName, value) {
-    return content.replaceAll(`<(${variableName})`, value)
-}
-function createNamespace(namespacePath) {
-    let package_json = PACKAGE_JSON_IN
-    const variables = {
-        NSPATH: namespacePath,
-        PKGNAME: 'rx-reader',
-        INSTALLDIR: Array.from(namespacePath.split('/'), () => '..').join('/')
+function buildPackageJson() {
+    const packageJson = JSON.parse(readFileSync('package.json'))
+    delete packageJson.private
+    packageJson.types = 'index.d.ts'
+    packageJson.module = 'index.js'
+    packageJson.exports = {
+        '.': {
+            types: './index.d.ts',
+            import: './index.js'
+        },
+        './package.json': './package.json'
+    }
+    delete packageJson.scripts
+    delete packageJson.devDependencies
+
+    for (const namespace of NAMESPACES) {
+        packageJson.exports[`./${namespace}`] = {
+            types: `./${namespace}/index.d.ts`,
+            import: `./${namespace}/index.js`
+        }
     }
 
-    for (const variableName in variables)
-        package_json = insertVariable(package_json, variableName, variables[variableName])
+    if (!existsSync('build')) mkdirSync('build')
 
-    mkdirSync(namespacePath, {recursive: true})
-    writeFileSync(`${namespacePath}/package.json`, package_json, {encoding: 'utf-8'})
+    writeFileSync('build/package.json', JSON.stringify(packageJson), 'utf-8')
+}
+function buildMarkdown() {
+    for (const file of readdirSync('.')) {
+        if (path.extname(file) !== '.md') continue
+
+        copyFileSync(file, `build/${file}`)
+    }
 }
 
-NAMESPACES.forEach(createNamespace)
+buildPackageJson()
+buildMarkdown()
 
 /** @type {import('rollup').RollupOptions[]} */
 const config = [
     {
         output: {
-            dir: 'dist',
+            dir: 'build',
             entryFileNames: createEntryFileNames(),
             chunkFileNames: '.chunks/[name]-[hash].js',
             format: 'esm'
@@ -85,6 +96,7 @@ const config = [
             typescript(),
             terser({
                 ecma: 2020,
+                module: true,
                 keep_classnames: true,
                 keep_fnames: true
             })
@@ -92,7 +104,7 @@ const config = [
     },
     {
         output: {
-            dir: 'dist',
+            dir: 'build',
             entryFileNames: createEntryFileNames('.d.ts'),
             chunkFileNames: '.chunks/[name]-[hash].d.ts',
             format: 'esm'
